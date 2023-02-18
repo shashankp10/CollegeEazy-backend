@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.entities.User;
 import com.project.exceptions.ResourceNotFoundException;
-import com.project.payload.UserDto;
+import com.project.module.dto.UserDto;
 import com.project.repositories.UserRepo;
 import com.project.services.UserService;
 
@@ -87,4 +87,9 @@ public class UserServiceImpl implements UserService{
 		userDto.setPassword(user.getPassword());
 		return userDto;
 	}	
+	
+	@Override
+	public User findByEnrollementAndPassword(String enrollment, String password) {
+		return userRepo.findByEnrollmentAndPassword(enrollment, password);
+	}
 }

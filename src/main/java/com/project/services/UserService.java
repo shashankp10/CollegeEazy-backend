@@ -2,7 +2,8 @@ package com.project.services;
 
 import java.util.List;
 
-import com.project.payload.UserDto;
+import com.project.entities.User;
+import com.project.module.dto.UserDto;
 
 public interface UserService {
 	
@@ -11,4 +12,5 @@ public interface UserService {
 	UserDto getUserById(Long userId);
 	List<UserDto> getAllUser();
 	void deleteUser(Long userId);
+	User findByEnrollementAndPassword(String enrollment, String password);
 }

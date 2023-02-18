@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.entities.User;
+import com.project.module.dto.UserDto;
+import com.project.module.dto.UserLogin;
 import com.project.payload.ApiResponse;
-import com.project.payload.UserDto;
 import com.project.services.UserService;
 
 @RestController
@@ -28,9 +30,22 @@ public class UserController {
 	@PostMapping("/register")
 	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
 		UserDto createUserDto = this.userService.createUser(userDto);
+		System.out.println("User registered successfully!!");
 		return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
 	}
 	
+	@PostMapping("/login")
+	public ResponseEntity<UserLogin> login(@RequestBody UserDto userDto){
+		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword());
+		UserLogin userLogin = new UserLogin();
+		if(loginUser!=null) {
+			userLogin.setStatus("tum mere dost ho, aao aao!!");
+			return new ResponseEntity<>(userLogin, HttpStatus.OK);
+		}
+		userLogin.setStatus("bhai yr ye tu kya kr rha hai!!");
+		return new ResponseEntity<>(userLogin, HttpStatus.NOT_FOUND);
+		
+	}  
 	@PutMapping("/users/{userId}")
 	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId")Long uid){
 		UserDto updateUser = this.userService.updateUser(userDto, uid);

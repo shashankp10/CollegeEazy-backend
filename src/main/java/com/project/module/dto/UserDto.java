@@ -1,4 +1,4 @@
-package com.project.payload;
+package com.project.module.dto;
  
 import lombok.Getter;
 import lombok.NoArgsConstructor;

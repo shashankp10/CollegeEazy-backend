@@ -1,12 +1,8 @@
 package com.project.module.dto;
- 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@Getter
-@Setter
+import lombok.Data;
+
+@Data
 public class UserDto {
 	
 	private long id;

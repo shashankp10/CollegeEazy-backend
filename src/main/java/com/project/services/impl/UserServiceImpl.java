@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDto updateUser(UserDto userDto, Long userId) {
+	public UserDto updateUser(UserDto userDto, long userId) {
 		User user = this.userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
 		
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDto getUserById(Long userId) {
+	public UserDto getUserById(long userId) {
 		User user = this.userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
 		
@@ -92,4 +92,5 @@ public class UserServiceImpl implements UserService{
 	public User findByEnrollementAndPassword(String enrollment, String password) {
 		return userRepo.findByEnrollmentAndPassword(enrollment, password);
 	}
+	
 }

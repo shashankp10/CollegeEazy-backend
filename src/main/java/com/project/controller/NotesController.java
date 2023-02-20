@@ -41,9 +41,10 @@ public class NotesController {
 	}
 	*/
 	@DeleteMapping("/delete/{uid}")
-	public ResponseEntity<ApiResponse> deleteNotes(@PathVariable("subjectId") Long uid){
+	public ResponseEntity<ApiResponse> deleteNotes(@PathVariable Long uid){
 		this.notesService.deleteNotes(uid);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("deleted successfully", true),HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
+
 	}
 	
 	@GetMapping(value="/fetch/{subjectId}/{type}")

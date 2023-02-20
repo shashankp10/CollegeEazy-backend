@@ -46,18 +46,15 @@ public class NotesServiceImpl implements NotesService {
 	
 	@Override
 	public void deleteNotes(Long uid) {
-//		Notes notes = this.notesRepo.findById(subjectId)
-//				.orElseThrow(() -> new ResourceNotFoundException("Notes : ","Id",subjectId));
-//		Notes notes = this.notesRepo.findByUId(uid);
-//		this.notesRepo.deleteByUId(notes);
+		Notes notes = this.notesRepo.findById(uid).orElseThrow(() -> new ResourceNotFoundException("Notes","Id",uid));
+		this.notesRepo.delete(notes);
+		// User don't know what the uid... Do something else to delete the row!!
 		
 	}
 	public List<Notes> findById(String subjectId,String type) {
 		return notesRepo.findBySubjectIdAndType(subjectId,type);
 	}
-//	public Notes findByUId(Long Id) {
-//		return notesRepo.findByUId(Id);
-//	}
+	
 	private Notes dtoToNotes(NotesDto notesDto) {
 		Notes notes = new Notes();
 		notes.setBranch(notesDto.getBranch());

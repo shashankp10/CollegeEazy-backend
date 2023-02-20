@@ -8,6 +8,5 @@ import com.project.entities.Notes;
 
 public interface NotesRepo extends JpaRepository<Notes, Long> {
 	List<Notes> findBySubjectIdAndType(String subjectId,String type	);
-//	Notes findByUId(Long uid);
-//	void deleteByUId(Notes notes);
+
 }

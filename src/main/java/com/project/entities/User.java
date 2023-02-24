@@ -1,7 +1,5 @@
 package com.project.entities;
 
-
-
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 import jakarta.persistence.Column;

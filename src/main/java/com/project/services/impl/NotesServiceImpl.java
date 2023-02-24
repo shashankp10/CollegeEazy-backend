@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.entities.Notes;
+import com.project.exceptions.ResourceNotFoundException;
 import com.project.module.dto.NotesDto;
 import com.project.repositories.NotesRepo;
 import com.project.services.NotesService;
@@ -46,18 +47,15 @@ public class NotesServiceImpl implements NotesService {
 	
 	@Override
 	public void deleteNotes(Long uid) {
-//		Notes notes = this.notesRepo.findById(subjectId)
-//				.orElseThrow(() -> new ResourceNotFoundException("Notes : ","Id",subjectId));
-//		Notes notes = this.notesRepo.findByUId(uid);
-//		this.notesRepo.deleteByUId(notes);
+		Notes notes = this.notesRepo.findById(uid)
+				.orElseThrow(() -> new ResourceNotFoundException("Notes","Id",uid));
+		
+		this.notesRepo.delete(notes);
 		
 	}
 	public List<Notes> findById(String subjectId,String type) {
 		return notesRepo.findBySubjectIdAndType(subjectId,type);
 	}
-//	public Notes findByUId(Long Id) {
-//		return notesRepo.findByUId(Id);
-//	}
 	private Notes dtoToNotes(NotesDto notesDto) {
 		Notes notes = new Notes();
 		notes.setBranch(notesDto.getBranch());

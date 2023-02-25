@@ -45,7 +45,12 @@ public class NotesController {
 		this.notesService.deleteNotes(uid);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
 
+<<<<<<< HEAD
 	}	
+=======
+	}
+	
+>>>>>>> cb7bff8f99c4b00054a618ccc5e4d41c170aa3ce
 	@GetMapping(value="/fetch/{subjectId}/{type}")
 	public ResponseEntity<List<Notes>> getNotes(@PathVariable String subjectId,@PathVariable String type){
 		return ResponseEntity.ok(this.notesService.findAllNotesBySubjectId(subjectId,type));

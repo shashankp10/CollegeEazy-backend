@@ -1,5 +1,7 @@
 package com.project.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.entities.Attendance;
 import com.project.module.dto.AttendanceDto;
 import com.project.services.AttendanceService;
 
@@ -28,10 +29,16 @@ public class AttendanceController {
 		System.out.println("Created successfully!!");
 		return new ResponseEntity<>(createUserAttendanceDto, HttpStatus.CREATED);
 	}
-	
+	/*
 	@GetMapping("/get/{enrollment}")
 	public ResponseEntity<Attendance> getUserByEnrollment(@PathVariable Integer enrollment){
 		return ResponseEntity.ok(this.attendanceService.findByEnrollment(enrollment));
+	}*/
+	@GetMapping("/{enrollment}")
+	public ResponseEntity<List<Object[]>> getAll(@PathVariable Integer enrollment){
+		// validation -> for null check
+		
+		return ResponseEntity.ok(this.attendanceService.getAll(enrollment));
 	}
 	
 	@PutMapping("/update/{enrollment}")

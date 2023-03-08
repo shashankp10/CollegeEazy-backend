@@ -47,10 +47,10 @@ public class UserController {
 		}
 	}
 		// clicking on --> Create an account
-	@GetMapping("/register")
-	public ResponseEntity<List<String>> getAllEnrollments(){
-		return ResponseEntity.ok(this.userService.getAllEnrollments());
-	}
+//	@GetMapping("/register")
+//	public ResponseEntity<List<String>> getAllEnrollments(){
+//		return ResponseEntity.ok(this.userService.getAllEnrollments());
+//	}
 	
 	@PostMapping("/login")
 	public ResponseEntity<UserLogin> login(@RequestBody UserDto userDto){

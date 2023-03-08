@@ -14,5 +14,5 @@ public interface UserService {
 	void deleteUser(Long userId);
 	User findByEnrollementAndPassword(String enrollment, String password);
 	User findByEnrollment(String enrollment);
-	List<String> getAllEnrollments();
+	//List<String> getAllEnrollments();
 }

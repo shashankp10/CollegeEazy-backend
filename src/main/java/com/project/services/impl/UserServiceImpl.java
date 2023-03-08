@@ -51,13 +51,13 @@ public class UserServiceImpl implements UserService{
 		return this.userToDto(user);
 	}
 	
-	@Override
-	public List<String> getAllEnrollments(){
-		List<String> users = this.userRepo.getAllEnrollments();
-		//List<UserDto> userDtos = users.stream().map(user -> this.userToDto(user)).collect(Collectors.toList());
-		return users;
-	
-	}
+//	@Override
+//	public List<String> getAllEnrollments(){
+//		List<String> users = this.userRepo.getAllEnrollments();
+//		//List<UserDto> userDtos = users.stream().map(user -> this.userToDto(user)).collect(Collectors.toList());
+//		return users;
+//	
+//	}
 	@Override
 	public List<UserDto> getAllUser() {
 		List<User> users = this.userRepo.findAll();

@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,7 @@ import org.springframework.core.io.Resource;
 
 @RestController
 @RequestMapping("/collegeazy/notes")
+@CrossOrigin(origins = "http://localhost:3000")
 public class NotesController {
 	
 	@Autowired
@@ -71,17 +73,13 @@ public class NotesController {
 														@PathVariable String path){
 		return ResponseEntity.ok(this.notesService.findByPath(subjectId,type,path));
 	}
-//	@GetMapping(value="/fetch/{path}")  // {subjectId}/{type}/      @PathVariable String subjectId,@PathVariable String type, 
-//	public ResponseEntity<List<Object[]>> getNotesByPath(@PathVariable String path){
-//		return ResponseEntity.ok(this.notesService.findByPath(path));
-//	}
-	
+
 	/*
 	 * 	File related APIs 
 	 */
 	
 	
- 	@PostMapping("/uploadFile/{branch}/{type}/{subjectId}")
+	@PostMapping("/uploadFile/{branch}/{type}/{subjectId}")
     public ResponseEntity<FileUploadResponse> uploadFile(@PathVariable String branch, @PathVariable String type,@PathVariable String subjectId,
     		@RequestParam("file") MultipartFile multipartFile)throws IOException {
  	  

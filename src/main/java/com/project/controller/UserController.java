@@ -22,16 +22,18 @@ import com.project.module.dto.UserRegister;
 import com.project.payload.ApiResponse;
 import com.project.services.UserService;
 
+import jakarta.annotation.Nonnull;
+
 @RestController
 @RequestMapping("/collegeazy") 
-@CrossOrigin(origins = "http://localhost:3002")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 	
 	@Autowired
 	private UserService userService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
+	public ResponseEntity<UserDto> createUser(@RequestBody @Nonnull UserDto userDto){
 		User registerUser = userService.findByEnrollment(userDto.getEnrollment());
 		UserRegister userRegister = new UserRegister();
 		UserDto createUserDto = new UserDto();
@@ -47,13 +49,9 @@ public class UserController {
 		}
 	}
 		// clicking on --> Create an account
-//	@GetMapping("/register")
-//	public ResponseEntity<List<String>> getAllEnrollments(){
-//		return ResponseEntity.ok(this.userService.getAllEnrollments());
-//	}
-	
+
 	@PostMapping("/login")
-	public ResponseEntity<UserLogin> login(@RequestBody UserDto userDto){
+	public ResponseEntity<UserLogin> login(@RequestBody @Nonnull UserDto userDto){
 		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword());
 		UserLogin userLogin = new UserLogin();
 		if(loginUser!=null) {

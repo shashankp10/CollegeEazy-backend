@@ -15,7 +15,6 @@ public class Attendance {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int Id;
-	//@JoinColumn(name = "enrollment", foreignKey = @ForeignKey(name = "enrollment"))
 	private int enrollment;
 	
 	private String subject1;

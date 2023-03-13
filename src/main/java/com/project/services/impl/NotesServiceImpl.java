@@ -7,11 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,8 +63,6 @@ public class NotesServiceImpl implements NotesService {
 				.orElseThrow(() -> new ResourceNotFoundException("Notes","Id",uid));
 		
 		this.notesRepo.delete(notes);
-//		Notes notes = this.notesRepo.findById(uid).orElseThrow(() -> new ResourceNotFoundException("Notes","Id",uid));
-//		this.notesRepo.delete(notes);
 		// User don't know what the uid... Do something else to delete the row!!
 	}
 	

@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.entities.Attendance;
+import com.project.exceptions.ResourceNotFoundException;
 import com.project.module.dto.AttendanceDto;
 import com.project.repositories.AttendanceRepo;
 import com.project.services.AttendanceService;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AttendanceServiceImpl implements AttendanceService{
@@ -22,43 +25,53 @@ public class AttendanceServiceImpl implements AttendanceService{
 		Attendance saved = this.attendanceRepo.save(attendance);
 		return this.attendanceToDto(saved);
 	}
+	@Override
+	public Attendance findByEnrollment(int enrollment) {
+		return attendanceRepo.findByEnrollment(enrollment);
+	}
 	
 	@Override
-	public AttendanceDto updateUserAttendance(AttendanceDto attendanceDto, int enrollment) {
-		
-		Attendance attendance = this.attendanceRepo.findByEnrollment(enrollment);
-//				.orElseThrow(() -> new ResourceNotFoundException("Enrollment","Id",enrollment));
-		/*
-		 * If they want to update a particular column
-		 * 			1. take subjectId as parameter, put if-else block to update
-		 * 				particular field
-		 * 			2. function overloading with subjectId
-		 */
-		//attendance.setSubject1(attendanceDto.getSubject1());
-		attendance.setSubject1_present(attendanceDto.getSubject1_present());
-		attendance.setSubject1_absent(attendanceDto.getSubject1_absent());
-		
-		//attendance.setSubject2(attendanceDto.getSubject2());
-		attendance.setSubject2_present(attendanceDto.getSubject2_present());
-		attendance.setSubject2_absent(attendanceDto.getSubject2_absent());
-		
-		attendance.setSubject3_present(attendanceDto.getSubject3_present());
-		attendance.setSubject3_absent(attendanceDto.getSubject3_absent());
-		
-		attendance.setSubject4_present(attendanceDto.getSubject4_present());
-		attendance.setSubject4_absent(attendanceDto.getSubject4_absent());
-		
-		attendance.setSubject5_present(attendanceDto.getSubject5_present());
-		attendance.setSubject5_absent(attendanceDto.getSubject5_absent());
-		
-		attendance.setSubject6_present(attendanceDto.getSubject6_present());
-		attendance.setSubject6_absent(attendanceDto.getSubject6_absent());
-		
-		
-		Attendance updatedUser = this.attendanceRepo.save(attendance);
-		AttendanceDto attendanceDto1 = this.attendanceToDto(updatedUser);
-		return attendanceDto1;
+	public List<Object[]> getAll(int enrollment) {
+		List<Object[]> list = this.attendanceRepo.getAll(enrollment);
+		return list;
 	}
+	@Override
+	public void deleteUser(int uid) {
+
+		Attendance attendance = this.attendanceRepo.findById(uid)
+				.orElseThrow(() -> new ResourceNotFoundException("User","Id",uid));
+		
+		this.attendanceRepo.delete(attendance);
+		// User don't know what the uid... Do something else to delete the row!!
+	}
+	@Override
+	@Transactional
+	public void updateAttendance(int enrollment, int subjectNumber, int present, int absent) {
+		//attendanceRepo.updateAttendance(enrollment, subjectNumber, present, absent);
+		 switch (subjectNumber) {
+	        case 1:
+	            attendanceRepo.updateSubject1Attendance(enrollment, present, absent);
+	            break;
+	        case 2:
+	            attendanceRepo.updateSubject2Attendance(enrollment, present, absent);
+	            break;
+	        case 3:
+	            attendanceRepo.updateSubject3Attendance(enrollment, present, absent);
+	            break;
+	        case 4:
+	            attendanceRepo.updateSubject4Attendance(enrollment, present, absent);
+	            break;
+	        case 5:
+	            attendanceRepo.updateSubject5Attendance(enrollment, present, absent);
+	            break;
+	        case 6:
+	            attendanceRepo.updateSubject6Attendance(enrollment, present, absent);
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Invalid subjectNumber: " + subjectNumber);
+	    }
+	}
+	
 	/*
 	@Override
 	public AttendanceDto getUserById(int enrollment) {
@@ -130,15 +143,7 @@ public class AttendanceServiceImpl implements AttendanceService{
 		return attendanceDto;
 	}
 	
-	@Override
-	public Attendance findByEnrollment(int enrollment) {
-		return attendanceRepo.findByEnrollment(enrollment);
-	}
 	
-	@Override
-	public List<Object[]> getAll(int enrollment) {
-		List<Object[]> list = this.attendanceRepo.getAll(enrollment);
-		return list;
-	}
+		
 	
 }

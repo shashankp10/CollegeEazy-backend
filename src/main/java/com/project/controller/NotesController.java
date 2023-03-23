@@ -42,9 +42,16 @@ public class NotesController {
 	@Autowired
 	private NotesService notesService;
 	
+	private final String parentDirectory = "C:\\Users\\pande\\Documents\\workspace-spring-tool-suite-4-4.16.0.RELEASE\\Project-2\\Notes\\" ;
+ 	
 	
 	@PostMapping("/uploadLink")
 	public ResponseEntity<NotesDto> uploadLink(@RequestBody NotesDto notesDto){
+		if(notesDto.getBranch()==null || notesDto.getType()==null || notesDto.getData()==null
+				|| notesDto.getSubjectId()==null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+			// validation to check if user has logged in
 		NotesDto createNotesDto = this.notesService.createNotes(notesDto);
 		System.out.println("Link uploaded successfully!!");
 		return new ResponseEntity<>(createNotesDto, HttpStatus.CREATED);
@@ -52,6 +59,14 @@ public class NotesController {
 	/*
 	@PutMapping("/update/{subjectId}/{type}")
 	public ResponseEntity<NotesDto> updateNotes(@RequestBody NotesDto notesDto, @PathVariable("subjectId")String branchId, @PathVariable("type")String type){
+		if(branchId==null || type == null || notesDto == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		if(notesDto.getBranch()==null || notesDto.getType()==null || notesDto.getData()==null
+				|| notesDto.getSubjectId()==null || notesDto.getPath()==null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+				// validation to check if user has logged in
 		NotesDto updateNotes = this.notesService.updateNotes(notesDto, branchId, type);
 		System.out.println("Detail has been updated succesfully!!");
 		return ResponseEntity.ok(updateNotes);
@@ -59,18 +74,30 @@ public class NotesController {
 	*/
 	@DeleteMapping("/delete/{uid}")
 	public ResponseEntity<ApiResponse> deleteNotes(@PathVariable Long uid){
+		// check if uid is valid
+		// validation to check if user has logged in
+		// requested uid for deletion must belongs to the logged in user
 		this.notesService.deleteNotes(uid);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
 
 	}
 	@GetMapping(value="/fetch/{subjectId}/{type}")
 	public ResponseEntity<List<Notes>> getNotes(@PathVariable String subjectId,@PathVariable String type){
+		if(subjectId == null || type == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 		return ResponseEntity.ok(this.notesService.findAllNotesBySubjectId(subjectId,type));
 	}
 	
 	@GetMapping(value="/fetch/{subjectId}/{type}/{path}")
-	public ResponseEntity<List<Notes>> getNotesByPath(@PathVariable String subjectId,@PathVariable String type,
-														@PathVariable String path){
+	public ResponseEntity<List<Notes>> getNotesByPath(@PathVariable String subjectId,
+			@PathVariable String type, @PathVariable String path){
+		
+		if(subjectId == null || type == null || path == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 		return ResponseEntity.ok(this.notesService.findByPath(subjectId,type,path));
 	}
 
@@ -78,16 +105,17 @@ public class NotesController {
 	 * 	File related APIs 
 	 */
 	
-	
 	@PostMapping("/uploadFile/{branch}/{type}/{subjectId}")
-    public ResponseEntity<FileUploadResponse> uploadFile(@PathVariable String branch, @PathVariable String type,@PathVariable String subjectId,
-    		@RequestParam("file") MultipartFile multipartFile)throws IOException {
+    public ResponseEntity<FileUploadResponse> uploadFile(@PathVariable String branch,
+    		@PathVariable String type,@PathVariable String subjectId, 
+    		@RequestParam("file") MultipartFile multipartFile) throws IOException {
  	  
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
         long size = multipartFile.getSize();
          
         String filecode = notesService.uploadFile(fileName,branch,type,subjectId, multipartFile);
-         
+       
+        
         FileUploadResponse response = new FileUploadResponse();
         response.setFileName(fileName);
         response.setSize(size);
@@ -95,38 +123,41 @@ public class NotesController {
        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+	
  		// this end-point to download the file
- 	@GetMapping("/downloadFile/{fileCode}")
-    public ResponseEntity<?> downloadFile(@PathVariable("fileCode") String fileCode) {
- 		
- 			// validate if user has logged in
- 		
-        NotesServiceImpl downloadFiles = new NotesServiceImpl();
-         
-        Resource resource = null;
-        try {
-            resource = downloadFiles.downloadFile(fileCode);
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-         
-        if (resource == null) {
-            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
-        }
-         
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-         
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);       
-    }
+	@GetMapping("/downloadFile/{parentDir}/{fileCode:.+}")
+	public ResponseEntity<?> downloadFile(@PathVariable("parentDir") String parentDir,
+				@PathVariable("fileCode") String fileCode) {
+	    
+	    // validate if user has logged in
+	    
+	    NotesServiceImpl downloadFiles = new NotesServiceImpl();
+	    
+	    Resource resource = null;
+	    try {
+	        resource = downloadFiles.downloadFile(parentDir, fileCode);
+	    } catch (IOException e) {
+	        return ResponseEntity.internalServerError().build();
+	    }
+	    
+	    if (resource == null) {
+	        return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+	    }
+	    
+	    String contentType = "application/octet-stream";
+	    String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+	    
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.parseMediaType(contentType))
+	            .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+	            .body(resource);
+	}
  	
  		// this end-point for Preview
- 	@GetMapping("/file/{filename:.+}")
- 	public void getFile(@PathVariable String filename, HttpServletResponse response) {
- 	    String filePath = "C:\\Users\\pande\\Documents\\workspace-spring-tool-suite-4-4.16.0.RELEASE\\Project-2\\Files-Upload\\" + filename;
+	
+	@GetMapping("/file/{subjectCode}/{filename:.+}")
+ 	public void getFile(@PathVariable String subjectCode, @PathVariable String filename, HttpServletResponse response) {
+ 	    String filePath = parentDirectory + subjectCode + "\\" + filename;
  	    Path path = Paths.get(filePath);
 
  	    if (Files.exists(path)) {

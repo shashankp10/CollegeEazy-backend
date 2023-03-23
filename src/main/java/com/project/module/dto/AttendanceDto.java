@@ -6,7 +6,7 @@ import lombok.Data;
 public class AttendanceDto {
 	
 	private int Id;
-	private int enrollment;
+	private String enrollment;
 	
 	private String subject1;
 	private int subject1_present;

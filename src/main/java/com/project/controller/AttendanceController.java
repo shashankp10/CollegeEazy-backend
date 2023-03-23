@@ -1,6 +1,7 @@
 package com.project.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.entities.Attendance;
+import com.project.entities.Notes;
 import com.project.module.dto.AttendanceDto;
 import com.project.payload.ApiResponse;
 import com.project.services.AttendanceService;
+import com.project.services.impl.AttendanceServiceImpl;
 
 @RestController
 @RequestMapping("/collegeazy/attendance")
@@ -27,6 +31,7 @@ public class AttendanceController {
 	@Autowired
 	private AttendanceService attendanceService;
 	
+	
 			
 	@PostMapping("/create")
 	public ResponseEntity<AttendanceDto> createUserAttendance(@RequestBody AttendanceDto attendanceDto){
@@ -35,13 +40,22 @@ public class AttendanceController {
 		return new ResponseEntity<>(createUserAttendanceDto, HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/{enrollment}")
-	public ResponseEntity<List<Object[]>> getAll(@PathVariable Integer enrollment){
-		// validation -> for null check
+//	@GetMapping("/{enrollment}")
+//	public ResponseEntity<List<Object[]>> getAll(@PathVariable Integer enrollment){
+//		// validation -> for null check
+//		if(enrollment == null || attendanceService.findByEnrollment(enrollment) == null) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//		return ResponseEntity.ok(this.attendanceService.getAll(enrollment));
+//	}
+	@GetMapping(value="/{enrollment}")
+	public ResponseEntity<Map<String, Object>> getNotes(@PathVariable String enrollment){
+//		if(enrollment == null) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
 		
-		return ResponseEntity.ok(this.attendanceService.getAll(enrollment));
+		return ResponseEntity.ok(attendanceService.getData(enrollment));
 	}
-	
 	@DeleteMapping("/delete/{uid}")
 	public ResponseEntity<ApiResponse> deleteNotes(@PathVariable int uid){
 		this.attendanceService.deleteUser(uid);
@@ -51,7 +65,7 @@ public class AttendanceController {
 	
 	@PutMapping("/update/{enrollment}/{subjectNumber}/{present}/{absent}")
     public ResponseEntity<String> updateAttendance(
-        @PathVariable("enrollment") int enrollment,
+        @PathVariable("enrollment") String enrollment,
         @PathVariable("subjectNumber") int subjectNumber,
         @PathVariable("present") int present,
         @PathVariable("absent") int absent) {

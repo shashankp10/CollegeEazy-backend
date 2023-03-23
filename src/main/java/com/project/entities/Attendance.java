@@ -15,7 +15,7 @@ public class Attendance {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int Id;
-	private int enrollment;
+	private String enrollment;
 	
 	private String subject1;
 	private int subject1_present;

@@ -16,10 +16,12 @@ public class Shop {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	private String name;
-	private long enrollment; 
+	private String enrollment; 
 	private String description;
-	// use Big Decimal if you feel like using it
 	private String price;
-	private String contactDetail;
+	private String category;
+	private String contact;
+	private String title;
 	private String imagePath;
+	
 }

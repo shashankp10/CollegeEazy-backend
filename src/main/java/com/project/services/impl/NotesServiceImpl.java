@@ -2,6 +2,7 @@ package com.project.services.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -95,7 +96,7 @@ public class NotesServiceImpl implements NotesService {
 			MultipartFile multipartFile)throws IOException {
 		
 		String fileCode = RandomStringUtils.randomAlphanumeric(8);    
-        Path uploadPath = Paths.get("Files-Upload");
+        Path uploadPath = Paths.get("Notes",subjectId);
           
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -103,45 +104,42 @@ public class NotesServiceImpl implements NotesService {
         
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileCode + "-" + fileName);
-            System.out.println(filePath);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             
             Notes notes = new Notes();
-            notes.setPath(filePath.toString());
+            
+         // Remove the "Files-Upload\" prefix from the file path
+            String filePathString = filePath.toString().substring(filePath.toString().indexOf("\\") + 1);
+           
+            notes.setPath(filePathString);
             notes.setData(fileName);
             notes.setBranch(branch);
             notes.setSubjectId(subjectId);
             notes.setType(type);
             notesRepo.save(notes);
+            
         } catch (IOException ioe) {       
             throw new IOException("Could not save file: " + fileName, ioe);
         }
          
         return fileCode;
     }
-	
-	private Path foundFile;
 	@Override
-	public Resource downloadFile(String fileCode) throws IOException {
-	        Path dirPath = Paths.get("Files-Upload");
-	         
-	        Files.list(dirPath).forEach(file -> {
-	            if (file.getFileName().toString().startsWith(fileCode)) {
-	                foundFile = file;
-	                return;
-	            }
-	        });
-	 
-	        if (foundFile != null) {
-	            return new UrlResource(foundFile.toUri());
-	        }
-	         
-	        return null;
+	public Resource downloadFile(String parentDir, String fileCode) throws IOException {
+	    Path notesPath = Paths.get("Notes", parentDir);
+	    Path foundFile = Files.walk(notesPath, FileVisitOption.FOLLOW_LINKS)
+	        .filter(Files::isRegularFile)
+	        .filter(path -> path.getFileName().toString().startsWith(fileCode))
+	        .findFirst()
+	        .orElse(null);
+
+	    if (foundFile != null) {
+	        return new UrlResource(foundFile.toUri());
 	    }
-//	@Override
-//	public List<Notes> findNotesByPath(String subjectId, String type, String path) {
-//		return notesRepo.findNotesByPath(subjectId, type, path);
-//	}
+
+	    return null;
+	}
+
 	@Override
 	public List<Notes> findByPath(String subjectId, String type, String path) {
 		return notesRepo.findByPath(subjectId, type, path);

@@ -22,7 +22,6 @@ import com.project.module.dto.UserRegister;
 import com.project.payload.ApiResponse;
 import com.project.services.UserService;
 
-import jakarta.annotation.Nonnull;
 
 @RestController
 @RequestMapping("/collegeazy") 
@@ -33,30 +32,50 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserDto> createUser(@RequestBody @Nonnull UserDto userDto){
-		User registerUser = userService.findByEnrollment(userDto.getEnrollment());
-		UserRegister userRegister = new UserRegister();
-		UserDto createUserDto = new UserDto();
-		if(registerUser!=null) {		
-			userRegister.setStatus("Enrollment already exists...");
-			return new ResponseEntity<>(createUserDto, HttpStatus.BAD_REQUEST);
-			
-		}
-		else {	
-			createUserDto = this.userService.createUser(userDto);
-			System.out.println("User registered successfully!!");
-			return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
-		}
+	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
+		if(userDto.getBranch()==null || userDto.getEnrollment()==null || userDto.getPassword()==null
+				|| userDto.getName()==null || userDto.getSemester()==0) {
+	        // return message for null values
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(null);
+	    }
+//		if(userDto.getEnrollment().length()!=11 || userDto.getPassword().length()<=4) {
+//			// return message for invalid enrollment and password
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+	    User registerUser = userService.findByEnrollment(userDto.getEnrollment());
+	    UserRegister userRegister = new UserRegister();
+	    UserDto createUserDto = new UserDto();
+	    if(registerUser!=null) {      
+	        userRegister.setStatus("Enrollment already exists...");
+	        return new ResponseEntity<>(createUserDto, HttpStatus.BAD_REQUEST);
+	    }
+	    else {  
+	        createUserDto = this.userService.createUser(userDto);
+	        System.out.println("User registered successfully!!");
+	        return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
+	    }
+		
 	}
 		// clicking on --> Create an account
 
 	@PostMapping("/login")
-	public ResponseEntity<UserLogin> login(@RequestBody @Nonnull UserDto userDto){
+	public ResponseEntity<UserLogin> login(@RequestBody UserDto userDto){
+		if(userDto.getEnrollment()==null || userDto.getPassword()==null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		    
+		}
+		
+		if(userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword()) == null) {					
+			// return message for invalid enrollment and password
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword());
 		UserLogin userLogin = new UserLogin();
 		if(loginUser!=null) {
 			userLogin.setStatus("logged In");
-			System.out.println("logged In");
 			return new ResponseEntity<>(userLogin, HttpStatus.OK);
 		}
 		userLogin.setStatus("Incorrect password");
@@ -66,6 +85,11 @@ public class UserController {
 		// Update related setting
 	@PutMapping("/users/{userId}")
 	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId")Long uid){
+		if(userDto.getBranch()==null || userDto.getEnrollment()==null || userDto.getPassword()==null
+				|| userDto.getName()==null || userDto.getSemester()==0) {
+	        // return message for null values
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    }
 		UserDto updateUser = this.userService.updateUser(userDto, uid);
 		System.out.println("Detail has been updated succesfully!!");
 		return ResponseEntity.ok(updateUser);

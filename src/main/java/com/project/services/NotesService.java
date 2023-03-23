@@ -16,8 +16,7 @@ public interface NotesService {
 	List<Notes> findAllNotesBySubjectId(String subjectId,String types);
 	void deleteNotes(Long Id);
 	NotesDto updateNotes(NotesDto notesDto, String subjectId, String type);
-	public String uploadFile(String fileName,String branch, String type, String subjectId, MultipartFile multipartFile) throws IOException;
-	public Resource downloadFile(String fileCode) throws IOException;
+	String uploadFile(String fileName,String branch, String type, String subjectId, MultipartFile multipartFile) throws IOException;
 	List<Notes> findByPath(String subjectId,String type, String path);
-//	List<Object[]> findByPath(@Param("path") String path);
+	Resource downloadFile(String parentDir, String fileCode) throws IOException;
 }

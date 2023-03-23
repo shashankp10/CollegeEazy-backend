@@ -1,10 +1,19 @@
 package com.project.services.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.entities.Shop;
 import com.project.exceptions.ResourceNotFoundException;
@@ -20,19 +29,11 @@ public class ShopServiceImpl implements ShopService {
 	private ShopRepo shopRepo;
 	
 	@Override
-	public ShopDto addItem(ShopDto shopDto) {
-		Shop shop = this.dtoToShop(shopDto);
-		Shop savedItem = this.shopRepo.save(shop);
-		return this.shopToDto(savedItem);
-	}
-
-	@Override
 	public void deleteItem(int id) {
 		Shop shop = this.shopRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Item","Id",id));
 		
-		this.shopRepo.delete(shop);
-		
+		this.shopRepo.delete(shop);		
 	}
 	
 	@Override
@@ -43,59 +44,77 @@ public class ShopServiceImpl implements ShopService {
 	}
 	
 	@Override
-	public List<Shop> getItemByEnrollment(long enrollment) {
-		return shopRepo.findByEnrollment(enrollment);
+	public List<ShopDto> getItemByCategory(String category){
+		try{
+			List<Shop> itemsByCategory = this.shopRepo.findByCategory(category);
+			List<ShopDto> itemsDto = itemsByCategory.stream().map(shop -> this.shopToDto(shop)).collect(Collectors.toList());
+			return itemsDto; 
+		}catch(Exception e) {
+			System.err.println("Could not find category: " + category);
+	        e.printStackTrace();
+	        return Collections.emptyList();
+		}
+		
 	}
+	@Override
+	public List<Shop> findByCategory(String category){
+		return shopRepo.findByCategory(category);
+	}
+	
+	@Override
+	public String findEnrollmentByuid(Integer uid) {
+		return shopRepo.findEnrollmentByuid(uid);
+	}
+	
 	@Override
 	public ShopDto updateItem(ShopDto shopDto, int id) {
 		Shop shop = this.shopRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Item","Id",id));
 		
-		shop.setContactDetail(shopDto.getContactDetail());
+		shop.setCategory(shopDto.getCategory());
 		shop.setDescription(shopDto.getDescription());
 		shop.setPrice(shopDto.getPrice());
 		shop.setName(shop.getName());
 		shop.setImagePath(shop.getImagePath());
+		shop.setTitle(shop.getTitle());
+        shop.setContact(shop.getContact());
 		
 		Shop updatedItem = this.shopRepo.save(shop);
 		ShopDto shopDto1 = this.shopToDto(updatedItem);
 		return shopDto1;
 	}
 	
-	private Shop dtoToShop(ShopDto shopDto) {
-		Shop shop = new Shop();
-		shop.setName(shopDto.getName());
-		shop.setPrice(shopDto.getPrice());
-		shop.setContactDetail(shopDto.getContactDetail());
-		shop.setDescription(shopDto.getDescription());
-		shop.setEnrollment(shopDto.getEnrollment());
-		shop.setImagePath(shopDto.getImagePath());
-		return shop;
-	}
+//	private Shop dtoToShop(ShopDto shopDto) {
+//		Shop shop = new Shop();
+//		shop.setName(shopDto.getName());
+//		shop.setPrice(shopDto.getPrice());
+//		shop.setCategory(shopDto.getCategory());
+//		shop.setDescription(shopDto.getDescription());
+//		shop.setEnrollment(shopDto.getEnrollment());
+//		shop.setImagePath(shopDto.getImagePath());
+//		shop.setTitle(shopDto.getTitle());
+//		shop.setContact(shopDto.getContact());
+//		return shop;
+//	}
 	private ShopDto shopToDto(Shop shop) {
 		ShopDto shopDto = new ShopDto();
 		shopDto.setName(shop.getName());
 		shopDto.setPrice(shop.getPrice());
-		shopDto.setContactDetail(shop.getContactDetail());
+		shopDto.setCategory(shop.getCategory());
 		shopDto.setDescription(shop.getDescription());
 		shopDto.setEnrollment(shop.getEnrollment());
 		shopDto.setImagePath(shop.getImagePath());
+		shopDto.setTitle(shop.getTitle());
+		shopDto.setContact(shop.getContact());
 		return shopDto;
 	}
 
 	@Override
-	public void saveProduct(Shop product) {
-		 shopRepo.save(product);
-		
-	}
-/*
-	@Override
-	public String addItem(String fileName, String name, String description, String path,
-			String price, String contactDetail, long enrollment, 
-			MultipartFile multipartFile)throws IOException {
+	public String saveImage(String fileName, String category, String description, String name, String price,
+			String enrollment, String title, String contact, MultipartFile multipartFile)throws IOException {
 		
 		String fileCode = RandomStringUtils.randomAlphanumeric(8);    
-        Path uploadPath = Paths.get("Image-Upload");
+        Path uploadPath = Paths.get("Shop",category);
           
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -103,29 +122,33 @@ public class ShopServiceImpl implements ShopService {
         
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileCode + "-" + fileName);
-            System.out.println(filePath);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             
-//            Notes notes = new Notes();
-//            notes.setPath(filePath.toString());
-//            notes.setData(fileName);
-//            notes.se;
-//            notes.setSubjectId(subjectId);
-//            notes.setType(type);
-//            notesRepo.save(notes);
             Shop shop = new Shop();
-            shop.setContactDetail(contactDetail);
+            
+         // Remove the "Files-Upload\" prefix from the file path
+            String filePathString = filePath.toString().substring(filePath.toString().indexOf("\\") + 1);
+           
+            shop.setImagePath(filePathString);
+            //shop.setData(fileName);
+            shop.setCategory(category);
             shop.setDescription(description);
             shop.setEnrollment(enrollment);
             shop.setName(name);
             shop.setPrice(price);
-            shop.setPath(filePath.toString());
+            shop.setImagePath(filePathString);
+            shop.setTitle(title);
+            shop.setContact(contact);
+            
             shopRepo.save(shop);
+            
         } catch (IOException ioe) {       
-            throw new IOException("Could not save file: " + fileName, ioe);
+            throw new IOException("Could not save image: " + fileName, ioe);
         }
          
         return fileCode;
     }
-    */
+	
+	
+	
 }

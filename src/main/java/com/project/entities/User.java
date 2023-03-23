@@ -25,7 +25,6 @@ public class User {
 	private long id;
 	@Column
 	private String name;
-	
 	private String enrollment;
 	private String password;
 	private String branch;

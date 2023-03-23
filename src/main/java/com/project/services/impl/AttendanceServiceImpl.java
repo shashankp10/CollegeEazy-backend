@@ -1,8 +1,11 @@
 package com.project.services.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.project.entities.Attendance;
@@ -19,6 +22,9 @@ public class AttendanceServiceImpl implements AttendanceService{
 	@Autowired
 	private AttendanceRepo attendanceRepo;
 	
+	@Autowired
+    private JdbcTemplate jdbcTemplate;
+	
 	@Override
 	public AttendanceDto createUserAttendance(AttendanceDto attendanceDto) {
 		Attendance attendance =  this.dtoToAttendance(attendanceDto);
@@ -26,12 +32,12 @@ public class AttendanceServiceImpl implements AttendanceService{
 		return this.attendanceToDto(saved);
 	}
 	@Override
-	public Attendance findByEnrollment(int enrollment) {
+	public Attendance findByEnrollment(String enrollment) {
 		return attendanceRepo.findByEnrollment(enrollment);
 	}
 	
 	@Override
-	public List<Object[]> getAll(int enrollment) {
+	public List<Object[]> getAll(String enrollment) {
 		List<Object[]> list = this.attendanceRepo.getAll(enrollment);
 		return list;
 	}
@@ -46,7 +52,7 @@ public class AttendanceServiceImpl implements AttendanceService{
 	}
 	@Override
 	@Transactional
-	public void updateAttendance(int enrollment, int subjectNumber, int present, int absent) {
+	public void updateAttendance(String enrollment, int subjectNumber, int present, int absent) {
 		//attendanceRepo.updateAttendance(enrollment, subjectNumber, present, absent);
 		 switch (subjectNumber) {
 	        case 1:
@@ -72,6 +78,51 @@ public class AttendanceServiceImpl implements AttendanceService{
 	    }
 	}
 	
+		@Override
+	    public Map<String, Object> getData(String enrollment) {
+			//	        // Query to get semester and branch from users table
+	        String userQuery = "SELECT semester, branch FROM users WHERE enrollment = ?";
+	        Object[] userParams = {enrollment};
+	        Map<String, Object> userRow = jdbcTemplate.queryForMap(userQuery, userParams);
+
+	        // Query to get attendance data from attendance table
+	        String attendanceQuery = "SELECT subject1, subject1_present, subject1_absent,subject2, subject2_present, subject2_absent, subject3, subject3_present, subject3_absent,subject4, subject4_present, subject4_absent,subject5, subject5_present, subject5_absent,subject6, subject6_present, subject6_absent FROM attendance WHERE enrollment = ?";
+	        Object[] attendanceParams = {enrollment};
+	        List<Map<String, Object>> attendanceRows = jdbcTemplate.queryForList(attendanceQuery, attendanceParams);
+	        
+	        System.out.println(userRow);
+	        System.out.println(attendanceRows);
+	        // Create the final map with the desired format
+	        Map<String, Object> result = new HashMap<>();
+	        result.put("semester", userRow.get("semester"));
+	        result.put("branch", userRow.get("branch"));
+	        
+	        result.put("subject1", attendanceRows.get(0).get("subject1"));
+	        result.put("subject1_present", attendanceRows.get(0).get("subject1_present"));
+	        result.put("subject1_absent", attendanceRows.get(0).get("subject1_absent"));
+	        
+	        result.put("subject2", attendanceRows.get(0).get("subject2"));
+	        result.put("subject2_present", attendanceRows.get(0).get("subject2_present"));
+	        result.put("subject2_absent", attendanceRows.get(0).get("subject2_absent"));
+	        
+	        result.put("subject3", attendanceRows.get(0).get("subject3"));
+	        result.put("subject3_present", attendanceRows.get(0).get("subject3_present"));
+	        result.put("subject3_absent", attendanceRows.get(0).get("subject3_absent"));
+	        
+	        result.put("subject4", attendanceRows.get(0).get("subject4"));
+	        result.put("subject4_present", attendanceRows.get(0).get("subject4_present"));
+	        result.put("subject4_absent", attendanceRows.get(0).get("subject4_absent"));
+	        
+	        result.put("subject5", attendanceRows.get(0).get("subject5"));
+	        result.put("subject5_present", attendanceRows.get(0).get("subject5_present"));
+	        result.put("subject5_absent", attendanceRows.get(0).get("subject5_absent"));
+	        
+	        result.put("subject6", attendanceRows.get(0).get("subject6"));
+	        result.put("subject6_present", attendanceRows.get(0).get("subject6_present"));
+	        result.put("subject6_absent", attendanceRows.get(0).get("subject6_absent"));
+	       
+	        return result;
+	      }
 	/*
 	@Override
 	public AttendanceDto getUserById(int enrollment) {
@@ -142,7 +193,6 @@ public class AttendanceServiceImpl implements AttendanceService{
 		
 		return attendanceDto;
 	}
-	
 	
 		
 	

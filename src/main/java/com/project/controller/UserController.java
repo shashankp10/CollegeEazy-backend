@@ -1,7 +1,13 @@
 package com.project.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.entities.User;
+import com.project.exceptions.ErrorResponse;
 import com.project.module.dto.UserDto;
 import com.project.module.dto.UserLogin;
 import com.project.module.dto.UserRegister;
@@ -32,56 +39,86 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto){
-		if(userDto.getBranch()==null || userDto.getEnrollment()==null || userDto.getPassword()==null
-				|| userDto.getName()==null || userDto.getSemester()==0) {
-	        // return message for null values
+	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) throws NoSuchAlgorithmException{
+		if (StringUtils.isAnyBlank(userDto.getBranch(), userDto.getEnrollment(), userDto.getPassword(), userDto.getName())
+	            || userDto.getSemester()==0) {
+	        return ResponseEntity
+	                .status(HttpStatus.BAD_REQUEST)
+	                .body(new ErrorResponse("One or more field(s) is/are empty or null"));
+	    }
+		if(userDto.getEnrollment().length()!=11 || userDto.getPassword().length()<=4) {
+			String message = "Enrollment must be of 11 characters long and password must be"
+					+ "atleast 4 characters long!!";
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
-					.body(null);
-	    }
-//		if(userDto.getEnrollment().length()!=11 || userDto.getPassword().length()<=4) {
-//			// return message for invalid enrollment and password
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+					.body(new ErrorResponse(message));
+		}
 	    User registerUser = userService.findByEnrollment(userDto.getEnrollment());
-	    UserRegister userRegister = new UserRegister();
 	    UserDto createUserDto = new UserDto();
 	    if(registerUser!=null) {      
-	        userRegister.setStatus("Enrollment already exists...");
-	        return new ResponseEntity<>(createUserDto, HttpStatus.BAD_REQUEST);
+	    	return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorResponse("Enrollment already exists!!"));
 	    }
-	    else {  
-	        createUserDto = this.userService.createUser(userDto);
-	        System.out.println("User registered successfully!!");
-	        return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
+	    else { 
+	    	 String salt = UUID.randomUUID().toString();
+	         // Encrypt the password using the salt
+	         String encryptedPassword = encryptPassword(userDto.getPassword(), salt);
+	         userDto.setSalt(salt);
+	         userDto.setPassword(encryptedPassword);
+	         createUserDto = this.userService.createUser(userDto);
+	         System.out.println("User registered successfully!!");
+	         UserDto responseDto = new UserDto();
+	         responseDto.setName(createUserDto.getName());
+	         responseDto.setEnrollment(createUserDto.getEnrollment());
+	         responseDto.setBranch(createUserDto.getBranch());
+	         responseDto.setSemester(createUserDto.getSemester());
+	         return ResponseEntity
+						.status(HttpStatus.CREATED)
+						.body(new ErrorResponse("User registered successfully!!"));
 	    }
 		
+	}
+	private String encryptPassword(String password, String salt) throws NoSuchAlgorithmException {
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	    String text = password + salt;
+	    md.update(text.getBytes(StandardCharsets.UTF_8));
+	    byte[] digest = md.digest();
+	    String encryptedPassword = Base64.getEncoder().encodeToString(digest);
+	    return encryptedPassword;
 	}
 		// clicking on --> Create an account
 
 	@PostMapping("/login")
-	public ResponseEntity<UserLogin> login(@RequestBody UserDto userDto){
-		if(userDto.getEnrollment()==null || userDto.getPassword()==null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		    
+	public ResponseEntity<?> login(@RequestBody UserDto userDto) throws NoSuchAlgorithmException{
+		
+		if(StringUtils.isAnyBlank(userDto.getEnrollment(),userDto.getPassword())) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorResponse("Enrollment or password cannot be empty!!"));	    
+		}
+		String salt = userService.getSaltByEnrollment(userDto.getEnrollment());
+	
+		if(userService.findByEnrollementAndPassword(userDto.getEnrollment(), encryptPassword(userDto.getPassword(), salt)) == null) {					
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorResponse("Invalid credentials"));
+
 		}
 		
-		if(userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword()) == null) {					
-			// return message for invalid enrollment and password
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword());
-		UserLogin userLogin = new UserLogin();
+		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), encryptPassword(userDto.getPassword(), salt));		
 		if(loginUser!=null) {
-			userLogin.setStatus("logged In");
-			return new ResponseEntity<>(userLogin, HttpStatus.OK);
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(new ErrorResponse("Logged in!!"));
+
 		}
-		userLogin.setStatus("Incorrect password");
-		return new ResponseEntity<>(userLogin, HttpStatus.NOT_FOUND);
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(new ErrorResponse("Invalid credentials"));
 		
-	}  
+	} 
+	
 		// Update related setting
 	@PutMapping("/users/{userId}")
 	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId")Long uid){

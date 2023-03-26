@@ -11,4 +11,5 @@ public class UserDto {
 	private String password;
 	private String branch;
 	private int semester;
+	private String salt;
 }

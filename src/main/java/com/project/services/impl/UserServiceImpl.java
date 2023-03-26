@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService{
 		user.setEnrollment(userDto.getEnrollment());
 		user.setSemester(userDto.getSemester());
 		user.setPassword(userDto.getPassword());
+		user.setSalt(userDto.getSalt());
 		return user;
 	}
 	private UserDto userToDto(User user) {
@@ -92,6 +93,7 @@ public class UserServiceImpl implements UserService{
 		userDto.setEnrollment(user.getEnrollment());
 		userDto.setSemester(user.getSemester());
 		userDto.setPassword(user.getPassword());
+		userDto.setSalt(user.getSalt());
 		return userDto;
 	}	
 	
@@ -104,5 +106,12 @@ public class UserServiceImpl implements UserService{
 		return userRepo.findByEnrollment(enrollment);
 	}
 
+	@Override
+	public String getSaltByEnrollment(String enrollment) {
+		return userRepo.getSaltByEnrollment(enrollment);
+	}
+	
+	
+		
 	
 }

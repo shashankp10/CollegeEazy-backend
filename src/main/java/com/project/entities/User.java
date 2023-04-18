@@ -1,7 +1,5 @@
 package com.project.entities;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,8 +15,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Setter
-@EnableAutoConfiguration
-public class User {
+public class User{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,5 +26,4 @@ public class User {
 	private String password;
 	private String branch;
 	private int semester;
-	private String salt;
 }

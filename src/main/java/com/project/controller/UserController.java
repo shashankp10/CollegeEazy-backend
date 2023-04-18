@@ -1,11 +1,8 @@
 package com.project.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +37,7 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) throws NoSuchAlgorithmException{
+			// validation Checks!!
 		if (StringUtils.isAnyBlank(userDto.getBranch(), userDto.getEnrollment(), userDto.getPassword(), userDto.getName())
 	            || userDto.getSemester()==0) {
 	        return ResponseEntity
@@ -55,17 +53,13 @@ public class UserController {
 		}
 	    User registerUser = userService.findByEnrollment(userDto.getEnrollment());
 	    UserDto createUserDto = new UserDto();
+	    	// check if enrollment already exists!!
 	    if(registerUser!=null) {      
 	    	return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
 					.body(new ErrorResponse("Enrollment already exists!!"));
 	    }
 	    else { 
-	    	 String salt = UUID.randomUUID().toString();
-	         // Encrypt the password using the salt
-	         String encryptedPassword = encryptPassword(userDto.getPassword(), salt);
-	         userDto.setSalt(salt);
-	         userDto.setPassword(encryptedPassword);
 	         createUserDto = this.userService.createUser(userDto);
 	         System.out.println("User registered successfully!!");
 	         UserDto responseDto = new UserDto();
@@ -79,14 +73,6 @@ public class UserController {
 	    }
 		
 	}
-	private String encryptPassword(String password, String salt) throws NoSuchAlgorithmException {
-	    MessageDigest md = MessageDigest.getInstance("SHA-256");
-	    String text = password + salt;
-	    md.update(text.getBytes(StandardCharsets.UTF_8));
-	    byte[] digest = md.digest();
-	    String encryptedPassword = Base64.getEncoder().encodeToString(digest);
-	    return encryptedPassword;
-	}
 		// clicking on --> Create an account
 
 	@PostMapping("/login")
@@ -97,16 +83,15 @@ public class UserController {
 					.status(HttpStatus.BAD_REQUEST)
 					.body(new ErrorResponse("Enrollment or password cannot be empty!!"));	    
 		}
-		String salt = userService.getSaltByEnrollment(userDto.getEnrollment());
-	
-		if(userService.findByEnrollementAndPassword(userDto.getEnrollment(), encryptPassword(userDto.getPassword(), salt)) == null) {					
+		
+		if(userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword()) == null) {					
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)
 					.body(new ErrorResponse("Invalid credentials"));
 
 		}
 		
-		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), encryptPassword(userDto.getPassword(), salt));		
+		User loginUser = userService.findByEnrollementAndPassword(userDto.getEnrollment(), userDto.getPassword());		
 		if(loginUser!=null) {
 			return ResponseEntity
 					.status(HttpStatus.OK)
@@ -116,6 +101,7 @@ public class UserController {
 		return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
 				.body(new ErrorResponse("Invalid credentials"));
+		
 		
 	} 
 	

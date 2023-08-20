@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.entities.User;
@@ -80,7 +81,8 @@ public class UserServiceImpl implements UserService{
 		user.setBranch(userDto.getBranch());
 		user.setEnrollment(userDto.getEnrollment());
 		user.setSemester(userDto.getSemester());
-		user.setPassword(userDto.getPassword());
+		user.setPassword(encodePassword(userDto.getPassword()));
+		user.setRoles("ROLE_USER");
 		return user;
 	}
 	private UserDto userToDto(User user) {
@@ -91,6 +93,7 @@ public class UserServiceImpl implements UserService{
 		userDto.setEnrollment(user.getEnrollment());
 		userDto.setSemester(user.getSemester());
 		userDto.setPassword(user.getPassword());
+		userDto.setRoles(user.getRoles());
 		return userDto;
 	}	
 	
@@ -102,5 +105,9 @@ public class UserServiceImpl implements UserService{
 	public User findByEnrollment(String enrollment) {
 		return userRepo.findByEnrollment(enrollment);
 	}
-
+	
+	private String encodePassword(String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
+    }
 }

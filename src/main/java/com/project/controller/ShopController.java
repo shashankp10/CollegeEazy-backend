@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +33,7 @@ import com.project.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/collegeazy/store")
+@RequestMapping("/store/private")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ShopController {
 	
@@ -44,7 +45,7 @@ public class ShopController {
 	
 	private final String directory = "C:\\Users\\pande\\Documents\\workspace-spring-tool-suite-4-4.16.0.RELEASE\\Project-2\\shop\\";
 	
-	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@PostMapping("/addItem/{category}")
     public ResponseEntity<FileUploadResponse>  uploadFile(@RequestParam("file") MultipartFile file,
                            @RequestParam("directory") String directory,
@@ -63,6 +64,7 @@ public class ShopController {
 			// return message : seems like you haven't registered
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+		
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         long size = file.getSize();
         String filecode = shopService.saveImage(fileName, category, description, name, price, enrollment, title, contact, file);
@@ -75,11 +77,11 @@ public class ShopController {
        
         return new ResponseEntity<>(response, HttpStatus.OK);		       
     }
-	
+	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@GetMapping("/getImage/{category}/{filename:.+}")
  	public void getImage(@PathVariable String category, @PathVariable String filename, HttpServletResponse response) throws IOException {
  	    if(category == null || filename == null)
- 	    	return;// new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+ 	    	return;		// new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		
 		String filePath = directory + category + "\\" + filename;
  	    Path path = Paths.get(filePath);
@@ -101,9 +103,9 @@ public class ShopController {
  	    }
  	}
 	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@DeleteMapping("/removeItem/{enrollment}/{uid}")
 	public ResponseEntity<ApiResponse> removeItem(@PathVariable String enrollment, @PathVariable Integer uid){
-			// below authorization is not working
 		System.out.println(shopService.findEnrollmentByuid(uid));
 		System.out.println(enrollment);
 		if(userService.findByEnrollment(shopService.findEnrollmentByuid(uid)).toString().equals(enrollment)) {					
@@ -115,6 +117,7 @@ public class ShopController {
 
 	}
 	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@GetMapping("/items")
 	public ResponseEntity<List<ShopDto>> getAllItems(){
 		List<ShopDto> items = this.shopService.getAllItem();
@@ -126,11 +129,15 @@ public class ShopController {
 		return ResponseEntity.ok(this.shopService.getAllItem());
 	}
 	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@GetMapping("/items/{category}")
 	public ResponseEntity<List<ShopDto>> getItemByCategory(@PathVariable String category, HttpServletResponse response) throws IOException{
+//		String filename = "wk8ATHRV-book1.jpg";
+//		getImage(category,filename,response);
 		return ResponseEntity.ok(this.shopService.getItemByCategory(category));
 	}
 	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@PutMapping("/updateItem/{id}")
 	public ResponseEntity<ShopDto> updateItem(@RequestBody ShopDto shopDto,@PathVariable int id){
 			// not working properly

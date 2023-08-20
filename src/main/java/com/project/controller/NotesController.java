@@ -1,14 +1,11 @@
 package com.project.controller;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,30 +18,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
 
-import com.project.entities.Notes;
 import com.project.module.dto.NotesDto;
 import com.project.payload.ApiResponse;
 import com.project.payload.FileUploadResponse;
 import com.project.services.NotesService;
 import com.project.services.impl.NotesServiceImpl;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
 
 @RestController
-@RequestMapping("/collegeazy/notes")
+@RequestMapping("/notes/private")
 @CrossOrigin(origins = "http://localhost:3000")
 public class NotesController {
 	
 	@Autowired
 	private NotesService notesService;
 	
-	private final String parentDirectory = "C:\\Users\\pande\\Documents\\workspace-spring-tool-suite-4-4.16.0.RELEASE\\Project-2\\Notes\\" ;
- 	
-	
+	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@PostMapping("/uploadLink")
 	public ResponseEntity<NotesDto> uploadLink(@RequestBody NotesDto notesDto){
 		if(notesDto.getBranch()==null || notesDto.getType()==null || notesDto.getData()==null
@@ -72,6 +64,7 @@ public class NotesController {
 		return ResponseEntity.ok(updateNotes);
 	}
 	*/
+	@PreAuthorize(value = "hasRole('ROLE_USER')")  // change to admin
 	@DeleteMapping("/delete/{uid}")
 	public ResponseEntity<ApiResponse> deleteNotes(@PathVariable Long uid){
 		// check if uid is valid
@@ -81,30 +74,12 @@ public class NotesController {
 		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
 
 	}
-	@GetMapping(value="/fetch/{subjectId}/{type}")
-	public ResponseEntity<List<Notes>> getNotes(@PathVariable String subjectId,@PathVariable String type){
-		if(subjectId == null || type == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		return ResponseEntity.ok(this.notesService.findAllNotesBySubjectId(subjectId,type));
-	}
 	
-	@GetMapping(value="/fetch/{subjectId}/{type}/{path}")
-	public ResponseEntity<List<Notes>> getNotesByPath(@PathVariable String subjectId,
-			@PathVariable String type, @PathVariable String path){
-		
-		if(subjectId == null || type == null || path == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		return ResponseEntity.ok(this.notesService.findByPath(subjectId,type,path));
-	}
 
 	/*
 	 * 	File related APIs 
 	 */
-	
+	@PreAuthorize(value = "hasRole('ROLE_USER')")  // change to admin
 	@PostMapping("/uploadFile/{branch}/{type}/{subjectId}")
     public ResponseEntity<FileUploadResponse> uploadFile(@PathVariable String branch,
     		@PathVariable String type,@PathVariable String subjectId, 
@@ -125,6 +100,7 @@ public class NotesController {
     }
 	
  		// this end-point to download the file
+	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@GetMapping("/downloadFile/{parentDir}/{fileCode:.+}")
 	public ResponseEntity<?> downloadFile(@PathVariable("parentDir") String parentDir,
 				@PathVariable("fileCode") String fileCode) {
@@ -154,25 +130,5 @@ public class NotesController {
 	}
  	
  		// this end-point for Preview
-	
-	@GetMapping("/file/{subjectCode}/{filename:.+}")
- 	public void getFile(@PathVariable String subjectCode, @PathVariable String filename, HttpServletResponse response) {
- 	    String filePath = parentDirectory + subjectCode + "\\" + filename;
- 	    Path path = Paths.get(filePath);
-
- 	    if (Files.exists(path)) {
- 	        response.setContentType("application/pdf");
- 	        response.setHeader("Content-Disposition", "inline; filename=" + filename);
-
- 	        try {
- 	            Files.copy(path, response.getOutputStream());
- 	            response.getOutputStream().flush();
- 	        } catch (IOException ex) {
- 	            ex.printStackTrace();
- 	        }
- 	    } else {
- 	        throw new RuntimeException("File not found");
- 	    }
- 	}
  	
 }

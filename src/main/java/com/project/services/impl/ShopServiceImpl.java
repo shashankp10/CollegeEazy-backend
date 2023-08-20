@@ -96,6 +96,7 @@ public class ShopServiceImpl implements ShopService {
 //		shop.setContact(shopDto.getContact());
 //		return shop;
 //	}
+			// use model mapper
 	private ShopDto shopToDto(Shop shop) {
 		ShopDto shopDto = new ShopDto();
 		shopDto.setName(shop.getName());

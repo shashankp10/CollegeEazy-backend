@@ -1,40 +1,69 @@
 package com.project.controller;
 
-import java.security.NoSuchAlgorithmException;
-
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.entities.User;
-import com.project.exceptions.ErrorResponse;
 import com.project.module.dto.UserDto;
-import com.project.module.dto.UserLogin;
-import com.project.module.dto.UserRegister;
 import com.project.payload.ApiResponse;
 import com.project.services.UserService;
 
 
 @RestController
-@RequestMapping("/collegeazy") 
+@RequestMapping("/private") 
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 	
 	@Autowired
 	private UserService userService;
 	
+	// Update related setting
+		@PreAuthorize(value = "hasRole('ROLE_USER')")
+		@PutMapping("/users/{userId}")
+		public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId")Long uid){
+			if(userDto.getBranch()==null || userDto.getEnrollment()==null || userDto.getPassword()==null
+					|| userDto.getName()==null || userDto.getSemester()==0) {
+		        // return message for null values
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		    }
+			UserDto updateUser = this.userService.updateUser(userDto, uid);
+			System.out.println("Detail has been updated succesfully!!");
+			return ResponseEntity.ok(updateUser);
+		}
+		
+		@PreAuthorize(value = "hasRole('ROLE_USER')")
+		@DeleteMapping("/users/{userId}")
+		public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Long uid){
+			this.userService.deleteUser(uid);;
+			return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
+		}
+		
+		@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin 
+		@GetMapping("/users")
+		public ResponseEntity<List<UserDto>> getAllUsers(){
+			System.out.println(userService.getAllUser());
+			return ResponseEntity.ok(this.userService.getAllUser());
+		}
+		 
+		@PreAuthorize(value = "hasRole('ROLE_USER')")
+		@GetMapping("/users/{userId}")
+		public ResponseEntity<UserDto> getSingleUser(@PathVariable Long userId){
+			return ResponseEntity.ok(this.userService.getUserById(userId));
+		}
+
+	
+	/*
 	@PostMapping("/register")
 	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) throws NoSuchAlgorithmException{
 			// validation Checks!!
@@ -72,9 +101,9 @@ public class UserController {
 						.body(new ErrorResponse("User registered successfully!!"));
 	    }
 		
-	}
+	}*/
 		// clicking on --> Create an account
-
+	/*
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody UserDto userDto) throws NoSuchAlgorithmException{
 		
@@ -103,36 +132,7 @@ public class UserController {
 				.body(new ErrorResponse("Invalid credentials"));
 		
 		
-	} 
+	} */
 	
-		// Update related setting
-	@PutMapping("/users/{userId}")
-	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId")Long uid){
-		if(userDto.getBranch()==null || userDto.getEnrollment()==null || userDto.getPassword()==null
-				|| userDto.getName()==null || userDto.getSemester()==0) {
-	        // return message for null values
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	    }
-		UserDto updateUser = this.userService.updateUser(userDto, uid);
-		System.out.println("Detail has been updated succesfully!!");
-		return ResponseEntity.ok(updateUser);
-	}
-	
-	@DeleteMapping("/users/{userId}")
-	public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Long uid){
-		this.userService.deleteUser(uid);;
-		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
-	}
-
-	@GetMapping("/users")
-	public ResponseEntity<List<UserDto>> getAllUsers(){
-		return ResponseEntity.ok(this.userService.getAllUser());
-	}
-	 
-
-	@GetMapping("/users/{userId}")
-	public ResponseEntity<UserDto> getSingleUser(@PathVariable Long userId){
-		return ResponseEntity.ok(this.userService.getUserById(userId));
-	}
-	
+			
 }

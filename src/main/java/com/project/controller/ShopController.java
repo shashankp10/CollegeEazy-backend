@@ -47,8 +47,8 @@ public class ShopController {
 	
 	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@PostMapping("/addItem/{category}")
-    public ResponseEntity<FileUploadResponse>  uploadFile(@RequestParam("file") MultipartFile file,
-                           @RequestParam("directory") String directory,
+    public ResponseEntity<FileUploadResponse>  uploadFile(
+                           @RequestParam("directory") String path,
                            @PathVariable("category") String category,
                            @RequestParam("description") String description,
                            @RequestParam("enrollment") String enrollment,
@@ -56,7 +56,7 @@ public class ShopController {
                            @RequestParam("price") String price,
                            @RequestParam("contact") String contact,
                            @RequestParam("title") String title) throws IOException {
-		if(directory==null || category==null || description==null || title ==null ||
+		if(path==null || category==null || description==null || title ==null ||
 				enrollment == null || name==null || price==null || contact==null)
 			// return message : seems like one or more field(s) is/are empty
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -65,15 +65,15 @@ public class ShopController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        long size = file.getSize();
-        String filecode = shopService.saveImage(fileName, category, description, name, price, enrollment, title, contact, file);
-       
-        
+//		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+//        long size = file.getSize();
+//        String filecode = shopService.saveImage(fileName, category, description, name, price, enrollment, title, contact, file);
+//       
+//        
         FileUploadResponse response = new FileUploadResponse();
-        response.setFileName(fileName);
-        response.setSize(size);
-        response.setDownloadUri(filecode);
+//        response.setFileName(fileName);
+//        response.setSize(size);
+//        response.setDownloadUri(filecode);
        
         return new ResponseEntity<>(response, HttpStatus.OK);		       
     }

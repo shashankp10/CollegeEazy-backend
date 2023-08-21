@@ -1,19 +1,12 @@
 package com.project.services.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.project.entities.Shop;
 import com.project.exceptions.ResourceNotFoundException;
@@ -27,6 +20,13 @@ public class ShopServiceImpl implements ShopService {
 
 	@Autowired
 	private ShopRepo shopRepo;
+	
+	@Override
+	public ShopDto addItem(ShopDto item) {
+		Shop items = this.dtoToShop(item);
+		Shop savedItem = this.shopRepo.save(items);
+		return this.shopToDto(savedItem);
+	}
 	
 	@Override
 	public void deleteItem(int id) {
@@ -109,7 +109,19 @@ public class ShopServiceImpl implements ShopService {
 		shopDto.setContact(shop.getContact());
 		return shopDto;
 	}
-
+	private Shop dtoToShop(ShopDto item) {
+		Shop shop = new Shop();
+		shop.setName(item.getName());
+		shop.setPrice(item.getPrice());
+		shop.setCategory(item.getCategory());
+		shop.setDescription(item.getDescription());
+		shop.setEnrollment(item.getEnrollment());
+		shop.setImagePath(item.getImagePath());
+		shop.setTitle(item.getTitle());
+		shop.setContact(item.getContact());
+		return shop;
+	}
+/*
 	@Override
 	public String saveImage(String fileName, String category, String description, String name, String price,
 			String enrollment, String title, String contact, MultipartFile multipartFile)throws IOException {
@@ -149,6 +161,8 @@ public class ShopServiceImpl implements ShopService {
          
         return fileCode;
     }
+*/
+
 	
 	
 	

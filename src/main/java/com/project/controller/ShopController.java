@@ -1,36 +1,27 @@
 package com.project.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.project.module.dto.ShopDto;
 import com.project.payload.ApiResponse;
-import com.project.payload.FileUploadResponse;
+import com.project.security.JWTUtils;
 import com.project.services.ShopService;
 import com.project.services.UserService;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/store/private")
@@ -43,12 +34,27 @@ public class ShopController {
 	@Autowired
 	private UserService userService;
 	
-	private final String directory = "C:\\Users\\pande\\Documents\\workspace-spring-tool-suite-4-4.16.0.RELEASE\\Project-2\\shop\\";
+	@Autowired
+	private JWTUtils jwtUtils;
 	
-	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
+	@PreAuthorize(value = "hasRole('ROLE_USER')") 
+	@PostMapping("/addItem")
+    public ResponseEntity<ShopDto>  uploadFile(@RequestBody ShopDto item){
+		if(item.getImagePath()==null || item.getCategory()==null || item.getDescription()==null || item.getTitle() ==null ||
+				item.getEnrollment() == null || item.getName()==null || item.getPrice()==null || item.getContact()==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		if(userService.findByEnrollment(item.getEnrollment())==null) {					
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		ShopDto createItemDto = this.shopService.addItem(item);
+		System.out.println("Item added successfully!!");
+		return new ResponseEntity<>(createItemDto, HttpStatus.CREATED);
+	}
+/*
+	@PreAuthorize(value = "hasRole('ROLE_USER')") 
 	@PostMapping("/addItem/{category}")
-    public ResponseEntity<FileUploadResponse>  uploadFile(
-                           @RequestParam("directory") String path,
+    public ResponseEntity<FileUploadResponse>  uploadFile(@RequestParam("file") MultipartFile file,
+                           @RequestParam("directory") String directory,
                            @PathVariable("category") String category,
                            @RequestParam("description") String description,
                            @RequestParam("enrollment") String enrollment,
@@ -56,7 +62,7 @@ public class ShopController {
                            @RequestParam("price") String price,
                            @RequestParam("contact") String contact,
                            @RequestParam("title") String title) throws IOException {
-		if(path==null || category==null || description==null || title ==null ||
+		if(directory==null || category==null || description==null || title ==null ||
 				enrollment == null || name==null || price==null || contact==null)
 			// return message : seems like one or more field(s) is/are empty
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -65,18 +71,20 @@ public class ShopController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-//		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-//        long size = file.getSize();
-//        String filecode = shopService.saveImage(fileName, category, description, name, price, enrollment, title, contact, file);
-//       
-//        
+		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        long size = file.getSize();
+        String filecode = shopService.saveImage(fileName, category, description, name, price, enrollment, title, contact, file);
+       
+        
         FileUploadResponse response = new FileUploadResponse();
-//        response.setFileName(fileName);
-//        response.setSize(size);
-//        response.setDownloadUri(filecode);
+        response.setFileName(fileName);
+        response.setSize(size);
+        response.setDownloadUri(filecode);
        
         return new ResponseEntity<>(response, HttpStatus.OK);		       
     }
+    */
+	/*
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@GetMapping("/getImage/{category}/{filename:.+}")
  	public void getImage(@PathVariable String category, @PathVariable String filename, HttpServletResponse response) throws IOException {
@@ -102,12 +110,13 @@ public class ShopController {
  	        throw new RuntimeException("File not found");
  	    }
  	}
-	
+	*/
 	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
-	@DeleteMapping("/removeItem/{enrollment}/{uid}")
-	public ResponseEntity<ApiResponse> removeItem(@PathVariable String enrollment, @PathVariable Integer uid){
-		System.out.println(shopService.findEnrollmentByuid(uid));
-		System.out.println(enrollment);
+	@DeleteMapping("/removeItem/{uid}")
+	public ResponseEntity<ApiResponse> removeItem(@RequestHeader("Authorization") String authorizationHeader, 
+									@PathVariable Integer uid){
+		String token = authorizationHeader.substring(7);
+	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
 		if(userService.findByEnrollment(shopService.findEnrollmentByuid(uid)).toString().equals(enrollment)) {					
 			// return message : seems like you're trying delete someone else item
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -118,17 +127,18 @@ public class ShopController {
 	}
 	
 	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
-	@GetMapping("/items")
+	@GetMapping("/")
 	public ResponseEntity<List<ShopDto>> getAllItems(){
-		List<ShopDto> items = this.shopService.getAllItem();
-
-	    for (ShopDto item : items) {
-	        String imagePath = "/getImage/" + item.getCategory() + "/" + item.getImagePath();
-	        item.setImagePath(imagePath);
-	    }
 		return ResponseEntity.ok(this.shopService.getAllItem());
+		//List<ShopDto> items = this.shopService.getAllItem();
+
+//	    for (ShopDto item : items) {
+//	        String imagePath = "/getImage/" + item.getCategory() + "/" + item.getImagePath();
+//	        item.setImagePath(imagePath);
+//	    }
+		
 	}
-	
+	/*
 	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
 	@GetMapping("/items/{category}")
 	public ResponseEntity<List<ShopDto>> getItemByCategory(@PathVariable String category, HttpServletResponse response) throws IOException{
@@ -143,5 +153,6 @@ public class ShopController {
 			// not working properly
 		return ResponseEntity.ok(this.shopService.updateItem(shopDto, id));
 	}
+	*/
 	
 }

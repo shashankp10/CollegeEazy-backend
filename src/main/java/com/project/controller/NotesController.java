@@ -37,15 +37,15 @@ public class NotesController {
 	private NotesService notesService;
 	
 	@PreAuthorize(value = "hasRole('ROLE_USER')") // change to admin
-	@PostMapping("/uploadLink")
+	@PostMapping("/upload")
 	public ResponseEntity<NotesDto> uploadLink(@RequestBody NotesDto notesDto){
 		if(notesDto.getBranch()==null || notesDto.getType()==null || notesDto.getData()==null
-				|| notesDto.getSubjectId()==null) {
+				|| notesDto.getSubjectId()==null || notesDto.getPath()==null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 			// validation to check if user has logged in
 		NotesDto createNotesDto = this.notesService.createNotes(notesDto);
-		System.out.println("Link uploaded successfully!!");
+		System.out.println("Data uploaded successfully!!");
 		return new ResponseEntity<>(createNotesDto, HttpStatus.CREATED);
 	}
 	/*
@@ -74,11 +74,10 @@ public class NotesController {
 		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
 
 	}
-	
-
 	/*
 	 * 	File related APIs 
 	 */
+	/*
 	@PreAuthorize(value = "hasRole('ROLE_USER')")  // change to admin
 	@PostMapping("/uploadFile/{branch}/{type}/{subjectId}")
     public ResponseEntity<FileUploadResponse> uploadFile(@PathVariable String branch,
@@ -98,7 +97,7 @@ public class NotesController {
        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-	
+	*/
  		// this end-point to download the file
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@GetMapping("/downloadFile/{parentDir}/{fileCode:.+}")

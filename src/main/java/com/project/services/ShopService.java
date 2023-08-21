@@ -1,13 +1,8 @@
 package com.project.services;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import com.project.entities.Notes;
 import com.project.entities.Shop;
-import com.project.module.dto.NotesDto;
 import com.project.module.dto.ShopDto;
 
 public interface ShopService {

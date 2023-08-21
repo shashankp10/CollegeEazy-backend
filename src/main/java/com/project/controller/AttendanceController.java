@@ -22,7 +22,6 @@ import com.project.payload.ApiResponse;
 import com.project.security.JWTUtils;
 import com.project.services.AttendanceService;
 
-import io.jsonwebtoken.Claims;
 
 @RestController
 @RequestMapping("/attendance/private")

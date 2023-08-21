@@ -1,7 +1,5 @@
 package com.project.controller;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.module.dto.NotesDto;
 import com.project.payload.ApiResponse;
-import com.project.payload.FileUploadResponse;
 import com.project.services.NotesService;
-import com.project.services.impl.NotesServiceImpl;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.core.io.Resource;
 
 @RestController
 @RequestMapping("/notes/private")

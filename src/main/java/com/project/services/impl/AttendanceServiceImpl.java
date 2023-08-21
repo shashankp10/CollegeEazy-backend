@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import com.project.entities.Attendance;
 import com.project.exceptions.ResourceNotFoundException;
 import com.project.module.dto.AttendanceDto;
 import com.project.repositories.AttendanceRepo;
-import com.project.security.JWTUtils;
 import com.project.services.AttendanceService;
 
 import jakarta.transaction.Transactional;

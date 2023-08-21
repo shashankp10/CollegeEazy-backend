@@ -40,7 +40,7 @@ public class ShopController {
 	@PreAuthorize(value = "hasRole('ROLE_USER')") 
 	@PostMapping("/addItem")
     public ResponseEntity<ShopDto>  uploadFile(@RequestBody ShopDto item){
-		if(item.getImagePath()==null || item.getCategory()==null || item.getDescription()==null || item.getTitle() ==null ||
+		if(item.getPath()==null || item.getCategory()==null || item.getDescription()==null || item.getTitle() ==null ||
 				item.getEnrollment() == null || item.getName()==null || item.getPrice()==null || item.getContact()==null)
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		if(userService.findByEnrollment(item.getEnrollment())==null) {					

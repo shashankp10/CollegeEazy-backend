@@ -22,6 +22,6 @@ public class Shop {
 	private String category;
 	private String contact;
 	private String title;
-	private String imagePath;
+	private String path;
 	
 }

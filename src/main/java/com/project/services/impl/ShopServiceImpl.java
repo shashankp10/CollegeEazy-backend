@@ -75,7 +75,7 @@ public class ShopServiceImpl implements ShopService {
 		shop.setDescription(shopDto.getDescription());
 		shop.setPrice(shopDto.getPrice());
 		shop.setName(shop.getName());
-		shop.setImagePath(shop.getImagePath());
+		shop.setPath(shop.getPath());
 		shop.setTitle(shop.getTitle());
         shop.setContact(shop.getContact());
 		
@@ -104,7 +104,7 @@ public class ShopServiceImpl implements ShopService {
 		shopDto.setCategory(shop.getCategory());
 		shopDto.setDescription(shop.getDescription());
 		shopDto.setEnrollment(shop.getEnrollment());
-		shopDto.setImagePath(shop.getImagePath());
+		shopDto.setPath(shop.getPath());
 		shopDto.setTitle(shop.getTitle());
 		shopDto.setContact(shop.getContact());
 		return shopDto;
@@ -116,7 +116,7 @@ public class ShopServiceImpl implements ShopService {
 		shop.setCategory(item.getCategory());
 		shop.setDescription(item.getDescription());
 		shop.setEnrollment(item.getEnrollment());
-		shop.setImagePath(item.getImagePath());
+		shop.setPath(item.getPath());
 		shop.setTitle(item.getTitle());
 		shop.setContact(item.getContact());
 		return shop;

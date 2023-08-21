@@ -111,8 +111,4 @@ public class UserPublicAPIs {
 	    }
     }
     
-    @GetMapping("/print")
-    public String dumppy() {
-    	return "Un-secured endpoint";
-    }
 }

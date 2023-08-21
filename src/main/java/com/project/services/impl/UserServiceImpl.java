@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
 		user.setBranch(userDto.getBranch());
 		user.setSemester(userDto.getSemester());
 		user.setEnrollment(userDto.getEnrollment());
-		user.setPassword(userDto.getPassword());
+		user.setPassword(encodePassword(userDto.getPassword()));
 		
 		User updatedUser = this.userRepo.save(user);
 		UserDto userDto1 = this.userToDto(updatedUser);

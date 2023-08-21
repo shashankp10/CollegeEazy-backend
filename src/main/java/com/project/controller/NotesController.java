@@ -8,15 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.util.StringUtils;
 
 import com.project.module.dto.NotesDto;
 import com.project.payload.ApiResponse;
@@ -71,7 +67,7 @@ public class NotesController {
 		// validation to check if user has logged in
 		// requested uid for deletion must belongs to the logged in user
 		this.notesService.deleteNotes(uid);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("user deleted successfully", true),HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("file deleted successfully", true),HttpStatus.OK);
 
 	}
 	/*
@@ -98,6 +94,7 @@ public class NotesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 	*/
+	/*
  		// this end-point to download the file
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@GetMapping("/downloadFile/{parentDir}/{fileCode:.+}")
@@ -128,6 +125,6 @@ public class NotesController {
 	            .body(resource);
 	}
  	
- 		// this end-point for Preview
+ 	*/
  	
 }

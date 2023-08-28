@@ -99,6 +99,7 @@ public class ShopServiceImpl implements ShopService {
 			// use model mapper
 	private ShopDto shopToDto(Shop shop) {
 		ShopDto shopDto = new ShopDto();
+		shopDto.setId(shop.getId());
 		shopDto.setName(shop.getName());
 		shopDto.setPrice(shop.getPrice());
 		shopDto.setCategory(shop.getCategory());
@@ -107,7 +108,6 @@ public class ShopServiceImpl implements ShopService {
 		shopDto.setPath(shop.getPath());
 		shopDto.setTitle(shop.getTitle());
 		shopDto.setContact(shop.getContact());
-		shopDto.setId(shop.getId());
 		return shopDto;
 	}
 	private Shop dtoToShop(ShopDto item) {

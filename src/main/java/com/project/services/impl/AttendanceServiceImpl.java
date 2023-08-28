@@ -215,7 +215,9 @@ public class AttendanceServiceImpl implements AttendanceService{
 		
 		return attendanceDto;
 	}
-	
-		
+	@Override
+	public Attendance doesEnrollmentExist(String enrollment) {
+		return attendanceRepo.findByEnrollment(enrollment);
+	}
 	
 }

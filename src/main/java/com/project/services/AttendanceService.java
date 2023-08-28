@@ -14,4 +14,5 @@ public interface AttendanceService {
 	void deleteUser(int uid);
 	void updateAttendance(String enrollment, int subjectNumber, int present, int absent);
 	Map<String, Object> getData(String enrollment);
+	Attendance doesEnrollmentExist(String enrollment);
 }

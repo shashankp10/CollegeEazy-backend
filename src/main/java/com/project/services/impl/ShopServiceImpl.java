@@ -107,6 +107,7 @@ public class ShopServiceImpl implements ShopService {
 		shopDto.setPath(shop.getPath());
 		shopDto.setTitle(shop.getTitle());
 		shopDto.setContact(shop.getContact());
+		shopDto.setId(shop.getId());
 		return shopDto;
 	}
 	private Shop dtoToShop(ShopDto item) {

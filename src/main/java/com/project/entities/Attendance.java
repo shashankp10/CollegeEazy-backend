@@ -41,5 +41,15 @@ public class Attendance {
 	private int subject6_present;
 	private int subject6_absent;
 	
+	private String subject7;
+	private int subject7_present;
+	private int subject7_absent;
 	
+	private String subject8;
+	private int subject8_present;
+	private int subject8_absent;
+	
+	private String subject9;
+	private int subject9_present;
+	private int subject9_absent;
 }

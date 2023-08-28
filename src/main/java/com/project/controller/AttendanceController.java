@@ -67,18 +67,6 @@ public class AttendanceController {
 	public ResponseEntity<Map<String, Object>> getAttendance(@RequestHeader("Authorization") String authorizationHeader){
 		String token = authorizationHeader.substring(7); 
 	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
-	    /*
-	    if (!attendanceService.doesEnrollmentExist(enrollment)) {
-//	        AttendanceDto attendanceDto = new AttendanceDto();
-//	        attendanceDto.setEnrollment(enrollment);
-	        ResponseEntity<AttendanceDto> createResponse = createUserAttendance(enrollment);
-	        if (createResponse.getStatusCode() != HttpStatus.CREATED) {
-	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-	        }
-	        enrollment = createResponse.getBody().getEnrollment();
-	    }
-	    return ResponseEntity.ok(attendanceService.getData(enrollment));
-	    */
 	    if (!attendanceService.doesEnrollmentExist(enrollment)) {
 	        AttendanceDto attendanceDto = new AttendanceDto();
 	        attendanceDto.setEnrollment(enrollment);
@@ -97,17 +85,15 @@ public class AttendanceController {
 	}
 	
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
-	@PutMapping("/update/{subjectNumber}/{present}/{absent}")
-    public ResponseEntity<String> updateAttendance(
-    	@RequestHeader("Authorization") String authorizationHeader,
-        @PathVariable("subjectNumber") int subjectNumber,
-        @PathVariable("present") int present,
-        @PathVariable("absent") int absent) {
-		
+	@PutMapping("/update")
+    public ResponseEntity<String> updateAttendance(@RequestHeader("Authorization") String authorizationHeader,
+    						@RequestBody AttendanceDto attendanceDto) {
 		String token = authorizationHeader.substring(7); 
 	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
-	    System.out.println(enrollment);
-        attendanceService.updateAttendance(enrollment, subjectNumber, present, absent);
+	    if (!attendanceService.doesEnrollmentExist(enrollment)) {
+	        return ResponseEntity.badRequest().body("Enrollment does not exist");
+	    }
+        attendanceService.updateAttendance(attendanceDto);
         return ResponseEntity.ok("Attendance updated successfully");
     }
 	

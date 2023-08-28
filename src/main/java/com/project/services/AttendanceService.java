@@ -12,7 +12,7 @@ public interface AttendanceService {
 	Attendance findByEnrollment(String enrollment);
 	List<Object[]> getAll(String enrollment);
 	void deleteUser(int uid);
-	void updateAttendance(String enrollment, int subjectNumber, int present, int absent);
+	void updateAttendance(AttendanceDto attendanceDto);
 	Map<String, Object> getData(String enrollment);
 	boolean doesEnrollmentExist(String enrollment);
 }

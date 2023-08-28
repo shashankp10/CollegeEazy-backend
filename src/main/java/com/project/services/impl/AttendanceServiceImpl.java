@@ -34,28 +34,11 @@ public class AttendanceServiceImpl implements AttendanceService{
 	
 	@Override
 	public AttendanceDto createUserAttendance(String enrollment) {
-//		int semester = extractSemesterFromEnrollment(enrollment);
-//		String branch = extractBranchFromEnrollment(enrollment);
-//		List<String> subjectIds =  getSubjectIdsForSemester(semester,branch);
 		Attendance attendance = new Attendance();
 		attendance.setEnrollment(enrollment);
-		//Attendance attendance =  this.dtoToAttendance(attendanceDto);
 		Attendance saved = this.attendanceRepo.save(attendance);
 		return this.attendanceToDto(saved);
 	}
-//	private List<String> getSubjectIdsForSemester(int semester, String branch) {
-//		List<String> firstYear = new ArrayList<>();
-//		firstYear.addAll(Arrays.asList("ES-101", "BS-103", "BS-105","ES-106", "ES-107", "BS-109","BS-111","BS-112", "HS-113", "HS-115","HS-117","ES-119", "BS-114"));
-//		return null;
-//	}
-//	private int extractSemesterFromEnrollment(String enrollment) {
-//		User user = userRepo.findByEnrollment(enrollment);
-//	    return user.getSemester();
-//	}
-//	private String extractBranchFromEnrollment(String enrollment) {
-//		User user = userRepo.findByEnrollment(enrollment);
-//	    return user.getBranch();
-//	}
 	@Override
 	public Attendance findByEnrollment(String enrollment) {
 		return attendanceRepo.findByEnrollment(enrollment);
@@ -77,29 +60,16 @@ public class AttendanceServiceImpl implements AttendanceService{
 	}
 	@Override
 	@Transactional
-	public void updateAttendance(String enrollment, int subjectNumber, int present, int absent) {
-		//attendanceRepo.updateAttendance(enrollment, subjectNumber, present, absent);
-		 switch (subjectNumber) {
-	        case 1:
-	            attendanceRepo.updateSubject1Attendance(enrollment, present, absent);
-	            break;
-	        case 2:
-	            attendanceRepo.updateSubject2Attendance(enrollment, present, absent);
-	            break;
-	        case 3:
-	            attendanceRepo.updateSubject3Attendance(enrollment, present, absent);
-	            break;
-	        case 4:
-	            attendanceRepo.updateSubject4Attendance(enrollment, present, absent);
-	            break;
-	        case 5:
-	            attendanceRepo.updateSubject5Attendance(enrollment, present, absent);
-	            break;
-	        case 6:
-	            attendanceRepo.updateSubject6Attendance(enrollment, present, absent);
-	            break;
-	        default:
-	            throw new IllegalArgumentException("Invalid subjectNumber: " + subjectNumber);
+	public void updateAttendance(AttendanceDto attendanceDto) {
+		String enrollment = attendanceDto.getEnrollment();
+	    Attendance existingAttendance = attendanceRepo.findByEnrollment(enrollment);
+	    if (existingAttendance != null) {
+	        Attendance updatedAttendance = dtoToAttendance(attendanceDto);
+	        updatedAttendance.setId(existingAttendance.getId());
+	        updatedAttendance.setEnrollment(existingAttendance.getEnrollment());
+	        attendanceRepo.save(updatedAttendance);
+	    } else {
+	    	throw new IllegalArgumentException("Null data received for attendance update");
 	    }
 	}
 	
@@ -145,6 +115,7 @@ public class AttendanceServiceImpl implements AttendanceService{
        
         return result;
     }
+    
 	/*
 	@Override
 	public AttendanceDto getUserById(int enrollment) {
@@ -182,6 +153,18 @@ public class AttendanceServiceImpl implements AttendanceService{
 		attendance.setSubject6(attendanceDto.getSubject6());
 		attendance.setSubject6_present(attendanceDto.getSubject6_present());
 		attendance.setSubject6_absent(attendanceDto.getSubject6_absent());
+		
+		attendance.setSubject7(attendanceDto.getSubject7());
+		attendance.setSubject7_present(attendanceDto.getSubject7_present());
+		attendance.setSubject7_absent(attendanceDto.getSubject7_absent());
+		
+		attendance.setSubject8(attendanceDto.getSubject8());
+		attendance.setSubject8_present(attendanceDto.getSubject8_present());
+		attendance.setSubject8_absent(attendanceDto.getSubject8_absent());
+		
+		attendance.setSubject9(attendanceDto.getSubject9());
+		attendance.setSubject9_present(attendanceDto.getSubject9_present());
+		attendance.setSubject9_absent(attendanceDto.getSubject9_absent());
 		return attendance;
 	}
 	private AttendanceDto attendanceToDto(Attendance attendance) {
@@ -213,6 +196,17 @@ public class AttendanceServiceImpl implements AttendanceService{
 		attendanceDto.setSubject6_present(attendance.getSubject6_present());
 		attendanceDto.setSubject6_absent(attendance.getSubject6_absent());
 		
+		attendanceDto.setSubject7(attendance.getSubject7());
+		attendanceDto.setSubject7_present(attendance.getSubject7_present());
+		attendanceDto.setSubject7_absent(attendance.getSubject7_absent());
+		
+		attendanceDto.setSubject8(attendance.getSubject8());
+		attendanceDto.setSubject8_present(attendance.getSubject8_present());
+		attendanceDto.setSubject8_absent(attendance.getSubject8_absent());
+		
+		attendanceDto.setSubject9(attendance.getSubject9());
+		attendanceDto.setSubject9_present(attendance.getSubject9_present());
+		attendanceDto.setSubject9_absent(attendance.getSubject9_absent());
 		return attendanceDto;
 	}
 	@Override

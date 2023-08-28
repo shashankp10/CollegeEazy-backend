@@ -67,9 +67,9 @@ public class AttendanceController {
 	public ResponseEntity<Map<String, Object>> getAttendance(@RequestHeader("Authorization") String authorizationHeader){
 		String token = authorizationHeader.substring(7); 
 	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
-	    if (attendanceService.doesEnrollmentExist(enrollment)==null) { // check if enrollment doesn't exists
-	        AttendanceDto attendanceDto = new AttendanceDto();
-	        attendanceDto.setEnrollment(enrollment);
+	    if (!attendanceService.doesEnrollmentExist(enrollment)) {
+//	        AttendanceDto attendanceDto = new AttendanceDto();
+//	        attendanceDto.setEnrollment(enrollment);
 	        ResponseEntity<AttendanceDto> createResponse = createUserAttendance(enrollment);
 	        if (createResponse.getStatusCode() != HttpStatus.CREATED) {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

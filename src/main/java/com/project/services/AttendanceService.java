@@ -8,7 +8,7 @@ import com.project.module.dto.AttendanceDto;
 
 public interface AttendanceService {
 	
-	AttendanceDto createUserAttendance(AttendanceDto attendanceDto);
+	AttendanceDto createUserAttendance(String enrollment);
 	Attendance findByEnrollment(String enrollment);
 	List<Object[]> getAll(String enrollment);
 	void deleteUser(int uid);

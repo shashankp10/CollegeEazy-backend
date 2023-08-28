@@ -34,10 +34,21 @@ public class AttendanceController {
 	@Autowired
 	private JWTUtils jwtUtils;
 	
+	/*
 	@PreAuthorize(value = "hasRole('ROLE_USER')")		
 	@PostMapping("/create")
 	public ResponseEntity<AttendanceDto> createUserAttendance(@RequestBody AttendanceDto attendanceDto){
 		AttendanceDto createUserAttendanceDto = this.attendanceService.createUserAttendance(attendanceDto);
+		System.out.println("Created successfully!!");
+		return new ResponseEntity<>(createUserAttendanceDto, HttpStatus.CREATED);
+	}*/
+	
+	@PreAuthorize(value = "hasRole('ROLE_USER')")		
+	@PostMapping("/create")
+	public ResponseEntity<AttendanceDto> createUserAttendance(@RequestHeader("Authorization") String authorizationHeader){
+		String token = authorizationHeader.substring(7); 
+	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
+		AttendanceDto createUserAttendanceDto = this.attendanceService.createUserAttendance(enrollment);
 		System.out.println("Created successfully!!");
 		return new ResponseEntity<>(createUserAttendanceDto, HttpStatus.CREATED);
 	}
@@ -54,13 +65,16 @@ public class AttendanceController {
 	@PreAuthorize(value = "hasRole('ROLE_USER')") 
 	@GetMapping(value="/")
 	public ResponseEntity<Map<String, Object>> getAttendance(@RequestHeader("Authorization") String authorizationHeader){
-		String token = authorizationHeader.substring(7); // Remove the "Bearer " prefix
-	    // Fetch the enrollment from the JWT token
+		String token = authorizationHeader.substring(7); 
 	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
-	    // Use the enrollment to retrieve the attendance data
-	    if (enrollment == null) {
-	    	System.out.println("Enrollment is Empty!!");
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    if (enrollment == null) { // check if enrollment doesn't exists
+	        AttendanceDto attendanceDto = new AttendanceDto();
+	        attendanceDto.setEnrollment(enrollment);
+	        ResponseEntity<AttendanceDto> createResponse = createUserAttendance(enrollment);
+	        if (createResponse.getStatusCode() != HttpStatus.CREATED) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	        enrollment = createResponse.getBody().getEnrollment();
 	    }
 	    return ResponseEntity.ok(attendanceService.getData(enrollment));
 	}

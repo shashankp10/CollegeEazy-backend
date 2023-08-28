@@ -1,5 +1,7 @@
 package com.project.services.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +11,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.project.entities.Attendance;
+import com.project.entities.User;
 import com.project.exceptions.ResourceNotFoundException;
 import com.project.module.dto.AttendanceDto;
 import com.project.repositories.AttendanceRepo;
+import com.project.repositories.UserRepo;
 import com.project.services.AttendanceService;
 
 import jakarta.transaction.Transactional;
@@ -25,12 +29,33 @@ public class AttendanceServiceImpl implements AttendanceService{
 	@Autowired
     private JdbcTemplate jdbcTemplate;
 	
+	@Autowired
+	private UserRepo userRepo;
+	
 	@Override
-	public AttendanceDto createUserAttendance(AttendanceDto attendanceDto) {
-		Attendance attendance =  this.dtoToAttendance(attendanceDto);
+	public AttendanceDto createUserAttendance(String enrollment) {
+//		int semester = extractSemesterFromEnrollment(enrollment);
+//		String branch = extractBranchFromEnrollment(enrollment);
+//		List<String> subjectIds =  getSubjectIdsForSemester(semester,branch);
+		Attendance attendance = new Attendance();
+		attendance.setEnrollment(enrollment);
+		//Attendance attendance =  this.dtoToAttendance(attendanceDto);
 		Attendance saved = this.attendanceRepo.save(attendance);
 		return this.attendanceToDto(saved);
 	}
+//	private List<String> getSubjectIdsForSemester(int semester, String branch) {
+//		List<String> firstYear = new ArrayList<>();
+//		firstYear.addAll(Arrays.asList("ES-101", "BS-103", "BS-105","ES-106", "ES-107", "BS-109","BS-111","BS-112", "HS-113", "HS-115","HS-117","ES-119", "BS-114"));
+//		return null;
+//	}
+//	private int extractSemesterFromEnrollment(String enrollment) {
+//		User user = userRepo.findByEnrollment(enrollment);
+//	    return user.getSemester();
+//	}
+//	private String extractBranchFromEnrollment(String enrollment) {
+//		User user = userRepo.findByEnrollment(enrollment);
+//	    return user.getBranch();
+//	}
 	@Override
 	public Attendance findByEnrollment(String enrollment) {
 		return attendanceRepo.findByEnrollment(enrollment);

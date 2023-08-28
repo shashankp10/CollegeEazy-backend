@@ -30,10 +30,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/users/public")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserPublicAPIs {
-
-	// Notes --> download
-	// Attendance --> all 
-	// Shop --> add product, delete product
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	

@@ -19,6 +19,7 @@ import com.project.entities.User;
 import com.project.exceptions.ErrorResponse;
 import com.project.module.dto.AuthenticationRequest;
 import com.project.module.dto.UserDto;
+import com.project.payload.AuthResponse;
 import com.project.security.JWTUtils;
 import com.project.security.JpaUserDetailsService;
 import com.project.services.UserService;
@@ -43,7 +44,7 @@ public class UserPublicAPIs {
     private JWTUtils jwtUtils;
 
     @PostMapping("/login")
-    public ResponseEntity<String> authenticate(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
         try {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.getEnrollment(), request.getPassword(),
@@ -57,12 +58,15 @@ public class UserPublicAPIs {
                 cookie.setHttpOnly(true);
                 cookie.setPath("/"); // Global
                 response.addCookie(cookie);
-                return ResponseEntity.ok(jwt);
+                //return ResponseEntity.ok(jwt);
+                AuthResponse authResponse = new AuthResponse(request.getEnrollment(), jwt);
+                return ResponseEntity.ok(authResponse);
             }
-            return ResponseEntity.status(400).body("Error authenticating");
+           // return ResponseEntity.status(400).body("Error authenticating");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
             System.out.println(e);
-            return ResponseEntity.status(400).body("" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse("", e.getMessage()));
         }
     }
 

@@ -112,6 +112,18 @@ public class AttendanceServiceImpl implements AttendanceService{
         result.put("subject6", attendanceRows.get(0).get("subject6"));
         result.put("subject6_present", attendanceRows.get(0).get("subject6_present"));
         result.put("subject6_absent", attendanceRows.get(0).get("subject6_absent"));
+        
+        result.put("subject7", attendanceRows.get(0).get("subject7"));
+        result.put("subject7_present", attendanceRows.get(0).get("subject7_present"));
+        result.put("subject7_absent", attendanceRows.get(0).get("subject7_absent"));
+        
+        result.put("subject8", attendanceRows.get(0).get("subject8"));
+        result.put("subject8_present", attendanceRows.get(0).get("subject8_present"));
+        result.put("subject8_absent", attendanceRows.get(0).get("subject8_absent"));
+        
+        result.put("subject9", attendanceRows.get(0).get("subject9"));
+        result.put("subject9_present", attendanceRows.get(0).get("subject9_present"));
+        result.put("subject9_absent", attendanceRows.get(0).get("subject9_absent"));
        
         return result;
     }

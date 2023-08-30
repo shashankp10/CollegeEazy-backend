@@ -48,6 +48,9 @@ public class AttendanceController {
 	public ResponseEntity<AttendanceDto> createUserAttendance(@RequestHeader("Authorization") String authorizationHeader){
 		String token = authorizationHeader.substring(7); 
 	    String enrollment = jwtUtils.getEnrollmentFromToken(token);
+	    if(attendanceService.doesEnrollmentExist(enrollment)) {
+	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    }
 		AttendanceDto createUserAttendanceDto = this.attendanceService.createUserAttendance(enrollment);
 		System.out.println("Created successfully!!");
 		return new ResponseEntity<>(createUserAttendanceDto, HttpStatus.CREATED);

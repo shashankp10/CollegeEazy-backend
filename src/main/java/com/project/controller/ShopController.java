@@ -23,6 +23,7 @@ import com.project.payload.ApiResponse;
 import com.project.security.JWTUtils;
 import com.project.services.ShopService;
 import com.project.services.UserService;
+import com.project.services.impl.CloudinaryService;
 
 @RestController
 @RequestMapping("/store/private")
@@ -37,6 +38,9 @@ public class ShopController {
 	
 	@Autowired
 	private JWTUtils jwtUtils;
+	
+	@Autowired
+	private CloudinaryService cloudinaryService;
 	
 	@PreAuthorize(value = "hasRole('ROLE_USER')") 
 	@PostMapping("/addItem")
@@ -155,5 +159,9 @@ public class ShopController {
 		return ResponseEntity.ok(this.shopService.updateItem(shopDto, id));
 	}
 	
+	@DeleteMapping("/cloud/{publicId}")
+    public void deleteImage(@PathVariable String publicId) throws Exception {
+        cloudinaryService.deleteImage(publicId);
+    }
 	
 }

@@ -44,11 +44,20 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserDto getUserById(long userId) {
-		User user = this.userRepo.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
-		
-		return this.userToDto(user);
+	public UserDto getUserById(String enrollment) {
+		User user = userRepo.findByEnrollment(enrollment);
+        if (user != null) {
+            UserDto userDto = new UserDto();
+            userDto.setId(user.getId());
+            userDto.setName(user.getName());
+            userDto.setBranch(user.getBranch());
+            userDto.setEnrollment(enrollment);
+            userDto.setSemester(user.getSemester());
+            return userDto;
+        } else {
+            return null; 
+        }
+        
 	}
 	
 //	@Override

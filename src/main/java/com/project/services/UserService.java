@@ -9,7 +9,7 @@ public interface UserService {
 	
 	UserDto createUser(UserDto userDto);
 	UserDto updateUser(UserDto user, long userId);
-	UserDto getUserById(long userId);
+	UserDto getUserById(String enrollment);
 	List<UserDto> getAllUser();
 	void deleteUser(Long userId);
 	User findByEnrollementAndPassword(String enrollment, String password);

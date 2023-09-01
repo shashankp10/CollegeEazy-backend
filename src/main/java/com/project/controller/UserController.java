@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.module.dto.UserDto;
 import com.project.payload.ApiResponse;
+import com.project.security.JWTUtils;
 import com.project.services.UserService;
 
 
@@ -27,6 +29,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private JWTUtils jwtUtils;
 	
 	// Update related setting
 		@PreAuthorize(value = "hasRole('ROLE_USER')")
@@ -57,9 +62,11 @@ public class UserController {
 		}
 		 
 		@PreAuthorize(value = "hasRole('ROLE_USER')")
-		@GetMapping("/users/{userId}")
-		public ResponseEntity<UserDto> getSingleUser(@PathVariable Long userId){
-			return ResponseEntity.ok(this.userService.getUserById(userId));
+		@GetMapping("/user")
+		public ResponseEntity<UserDto> getSingleUser(@RequestHeader("Authorization") String authorizationHeader){
+			String token = authorizationHeader.substring(7);
+		    String enrollment = jwtUtils.getEnrollmentFromToken(token);
+			return ResponseEntity.ok(this.userService.getUserById(enrollment));
 		}
 
 	

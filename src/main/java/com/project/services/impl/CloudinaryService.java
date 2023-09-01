@@ -10,12 +10,7 @@ import com.cloudinary.utils.ObjectUtils;
 @Service
 public class CloudinaryService {
 	
-	private final Cloudinary cloudinary;
-
-    @Autowired
-    public CloudinaryService(Cloudinary cloudinary) {
-        this.cloudinary = cloudinary;
-    }
+	private Cloudinary cloudinary;
 
     public void deleteImage(String publicId) {
         try {

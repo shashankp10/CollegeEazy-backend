@@ -159,10 +159,7 @@ public class ShopController {
 		return ResponseEntity.ok(this.shopService.updateItem(shopDto, id));
 	}
 	
-	@Autowired
-    public ShopController(CloudinaryService cloudinaryService) {
-        this.cloudinaryService = cloudinaryService;
-    }
+	
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@DeleteMapping("/cloud/{publicId}")
     public ResponseEntity<String> deleteImage(@PathVariable String publicId) {

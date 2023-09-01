@@ -19,6 +19,6 @@ public class CloudinaryService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-		return "deletion failed";
+		return publicId + "deletion failed";
     }
 }

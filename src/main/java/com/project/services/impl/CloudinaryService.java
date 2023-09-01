@@ -1,6 +1,5 @@
 package com.project.services.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cloudinary.Cloudinary;
@@ -12,11 +11,14 @@ public class CloudinaryService {
 	
 	private Cloudinary cloudinary;
 
-    public void deleteImage(String publicId) {
+    public String deleteImage(String publicId) {
         try {
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            String s = "Image with public ID " + publicId + " has been deleted from Cloudinary.";
+            return s;
         } catch (Exception e) {
             e.printStackTrace();
         }
+		return "deletion failed";
     }
 }

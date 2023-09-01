@@ -158,10 +158,16 @@ public class ShopController {
 			// not working properly
 		return ResponseEntity.ok(this.shopService.updateItem(shopDto, id));
 	}
+	
 	@PreAuthorize(value = "hasRole('ROLE_USER')")
 	@DeleteMapping("/cloud/{publicId}")
-    public void deleteImage(@PathVariable String publicId) throws Exception {
-        cloudinaryService.deleteImage(publicId);
+    public ResponseEntity<String> deleteImage(@PathVariable String publicId) throws Exception {
+		try {
+            cloudinaryService.deleteImage(publicId);
+            return ResponseEntity.ok("Image deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting the image");
+        }
     }
 	
 }

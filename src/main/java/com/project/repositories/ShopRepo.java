@@ -13,4 +13,5 @@ public interface ShopRepo extends JpaRepository<Shop, Integer>{
 	
 	@Query(value="SELECT enrollment FROM shop WHERE id = :uid",nativeQuery = true)
 	String findEnrollmentByuid(Integer uid);
+	
 }
